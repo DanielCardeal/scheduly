@@ -6,6 +6,9 @@ authors = ["Daniel Pessoa Cardeal <danielpessoa.cardeal@gmail.com>"]
 readme = "README.md"
 packages = [{include = "ime_usp_class_scheduler"}]
 
+[tool.poetry.scripts]
+scheduler = "ime_usp_class_scheduler.main:cli"
+
 [tool.poetry.dependencies]
 python = "^3.10"
 
