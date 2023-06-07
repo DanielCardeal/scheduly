@@ -5,34 +5,7 @@ import re
 
 from ime_usp_class_scheduler.parser import CourseData, ScheduleTimeslot
 
-
-class WorkloadParserException(Exception):
-    """Exception raised when an error occurs during parsing of CSV input files."""
-
-
-def time_to_period(time: dt.time) -> int:
-    """
-    Returns the time period that intersects a given time_input. If the time
-    period doesn't match any time periods, returns -1.
-
-    >>> time_to_period(dt.time(7, 40))
-    -1
-    >>> time_to_period(dt.time(8, 34))
-    1
-    >>> time_to_period(dt.time(10, 00))
-    2
-    >>> time_to_period(dt.time(15, 10))
-    3
-    """
-    if dt.time(8, 0) <= time <= dt.time(9, 40):
-        return 1
-    elif dt.time(10, 0) <= time <= dt.time(11, 40):
-        return 2
-    elif dt.time(14, 0) <= time <= dt.time(15, 40):
-        return 3
-    elif dt.time(16, 0) <= time <= dt.time(17, 40):
-        return 4
-    return -1
+from .main import get_teacher_id, time_to_period
 
 
 def get_fixed_classes(fixed_classes_input: str) -> list[ScheduleTimeslot]:
@@ -56,7 +29,7 @@ def get_fixed_classes(fixed_classes_input: str) -> list[ScheduleTimeslot]:
         10:00.
     """
     # Captures the triplet [weekday, class start time, class end time (if present)]
-    FIXED_CLASS_REGEX = "([2-6])a ([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?"
+    FIXED_CLASS_REGEX = r"([2-6])a ([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?"
     fixed_classes = set()
     for (weekday, start_time, end_time) in re.findall(FIXED_CLASS_REGEX,
                                                       fixed_classes_input):
@@ -81,27 +54,6 @@ def get_fixed_classes(fixed_classes_input: str) -> list[ScheduleTimeslot]:
         for period in periods:
             fixed_classes.add(ScheduleTimeslot(weekday, period))
     return fixed_classes
-
-
-def get_teacher_id(teacher_email: str) -> str:
-    """Extract a teacher id from their e-mail address.
-
-    The teachers' id is defined by everything before the domain address of their
-    e-mails, transformed to lowercase. Raises a WorkloadParserException if the
-    e-mail starts with a digit.
-
-    >>> get_teacher_id("alan-turing@linux.ime.usp.br")
-    alan_turing
-    >>> get_teacher_id("AlanTuring22@google.com")
-    alanturing22
-    """
-    if teacher_email[0].isdigit():
-        raise WorkloadParserException(
-            "teachers' e-mail cannot start with a digit")
-    teacher_email = teacher_email.lower()
-    teacher_email = teacher_email.replace(".", "")
-    teacher_email = teacher_email.replace("-", "_")
-    return teacher_email[:teacher_email.find("@")]
 
 
 def parse_workload(workload_file: io.TextIOWrapper) -> list[CourseData]:
