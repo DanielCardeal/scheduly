@@ -63,8 +63,6 @@ def parse_workload(workload_file: io.TextIOWrapper) -> list[CourseData]:
     """
     courses = []
     csv_reader = csv.reader(workload_file)
-    # TODO: add check_header function to assert compatibility with the
-    # parser
     _ = next(csv_reader)  # remove header
     for row in csv_reader:
         row = [value.strip() for value in row]

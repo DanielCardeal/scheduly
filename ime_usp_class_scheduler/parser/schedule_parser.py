@@ -40,8 +40,6 @@ def parse_schedule(schedule_file: io.TextIOWrapper) -> list[TeacherData]:
     """
     teachers = []
     csv_reader = csv.reader(schedule_file)
-    # TODO: add check_header function to assert compatibility with the
-    # parser
     _ = next(csv_reader)  # remove header
     for row in csv_reader:
         row = [value.strip() for value in row]
