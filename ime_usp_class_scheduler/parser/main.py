@@ -2,9 +2,11 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class ScheduledTime:
+class ScheduleTimeslot:
+    """Represents a timeslot on the schedule."""
+
     weekday: int
-    period: set[int]
+    period: int
 
 
 @dataclass(frozen=True)
@@ -20,6 +22,6 @@ class CourseData:
     """
 
     course_id: str
-    fixed_classes: list[ScheduledTime]
+    fixed_classes: set[ScheduleTimeslot]
     group: str
     teacher_id: str

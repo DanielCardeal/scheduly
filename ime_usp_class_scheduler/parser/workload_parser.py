@@ -3,7 +3,7 @@ import datetime as dt
 import io
 import re
 
-from ime_usp_class_scheduler.parser import CourseData, ScheduledTime
+from ime_usp_class_scheduler.parser import CourseData, ScheduleTimeslot
 
 
 class WorkloadParserException(Exception):
@@ -35,7 +35,7 @@ def time_to_period(time: dt.time) -> int:
     return -1
 
 
-def get_fixed_classes(fixed_classes_input: str) -> list[ScheduledTime]:
+def get_fixed_classes(fixed_classes_input: str) -> list[ScheduleTimeslot]:
     """Extract the fixed classes of a course from the input string.
 
     Examples of valid fixed classes inputs:
@@ -57,7 +57,7 @@ def get_fixed_classes(fixed_classes_input: str) -> list[ScheduledTime]:
     """
     # Captures the triplet [weekday, class start time, class end time (if present)]
     FIXED_CLASS_REGEX = "([2-6])a ([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?"
-    fixed_classes = []
+    fixed_classes = set()
     for (weekday, start_time, end_time) in re.findall(FIXED_CLASS_REGEX,
                                                       fixed_classes_input):
         weekday = int(weekday) - 1  # weekdays on the scheduler are repr. [1-5]
@@ -78,8 +78,8 @@ def get_fixed_classes(fixed_classes_input: str) -> list[ScheduledTime]:
         if end_period != -1:
             periods.add(end_period)
 
-        if len(periods) > 0:
-            fixed_classes.append(ScheduledTime(weekday, periods))
+        for period in periods:
+            fixed_classes.add(ScheduleTimeslot(weekday, period))
     return fixed_classes
 
 

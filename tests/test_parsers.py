@@ -2,7 +2,7 @@ import datetime as dt
 
 import pytest
 
-from ime_usp_class_scheduler.parser import CourseData, ScheduledTime
+from ime_usp_class_scheduler.parser import CourseData, ScheduleTimeslot
 from ime_usp_class_scheduler.parser.workload_parser import (
     WorkloadParserException, get_teacher_id, parse_workload, time_to_period)
 
@@ -25,31 +25,38 @@ class TestWorkloadParser:
     def test_parse_workload(self):
         TEST_FILE = "tests/data/test_workload.csv"
         expected = [
-            CourseData("mac0329",
-                       [ScheduledTime(2, {1}),
-                        ScheduledTime(4, {2})], "BCC", "nina"),
-            CourseData("mac0499", [], "BCC", "nina"),
-            CourseData("mac0101", [ScheduledTime(2, {3})], "BCC", "leliane"),
+            CourseData(
+                "mac0329",
+                {ScheduleTimeslot(2, 1),
+                 ScheduleTimeslot(4, 2)},
+                "BCC",
+                "nina",
+            ),
+            CourseData("mac0499", set(), "BCC", "nina"),
+            CourseData("mac0101", {ScheduleTimeslot(2, 3)}, "BCC", "leliane"),
             CourseData(
                 "mac0321",
-                [ScheduledTime(5, {1, 2}),
-                 ScheduledTime(5, {2})],
+                {ScheduleTimeslot(5, 1),
+                 ScheduleTimeslot(5, 2)},
                 "Poli EC - PCS 2",
                 "ddm",
             ),
             CourseData(
                 "mac0113",
-                [ScheduledTime(3, {1}),
-                 ScheduledTime(5, {1, 2})],
+                {
+                    ScheduleTimeslot(3, 1),
+                    ScheduleTimeslot(5, 1),
+                    ScheduleTimeslot(5, 2),
+                },
                 "FEA 1",
                 "pmiranda",
             ),
-            CourseData("mac2166", [ScheduledTime(5, {4})], "Poli Web C",
+            CourseData("mac2166", {ScheduleTimeslot(5, 4)}, "Poli Web C",
                        "fujita"),
-            CourseData("mac0113", [], "FEA 1", "hirata"),
-            CourseData("mac0320", [], "BCC", "yoshiko"),
-            CourseData("mac5770", [], "BCC_POS", "yoshiko"),
-            CourseData("mac0327", [], "BCC", "mksilva"),
+            CourseData("mac0113", set(), "FEA 1", "hirata"),
+            CourseData("mac0320", set(), "BCC", "yoshiko"),
+            CourseData("mac5770", set(), "BCC_POS", "yoshiko"),
+            CourseData("mac0327", set(), "BCC", "mksilva"),
         ]
         with open(TEST_FILE) as workload_file:
             assert parse_workload(workload_file) == expected

@@ -1,2 +1,2 @@
-from .main import CourseData, ScheduledTime
+from .main import CourseData, ScheduleTimeslot
 from .workload_parser import parse_workload, WorkloadParserException
