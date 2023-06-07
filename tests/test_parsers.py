@@ -1,8 +1,11 @@
 import datetime as dt
 
-from ime_usp_class_scheduler.parser import CourseData, ScheduleTimeslot
+from ime_usp_class_scheduler.parser import (CourseData, ScheduleTimeslot,
+                                            TeacherData, parse_schedule,
+                                            parse_workload)
+from ime_usp_class_scheduler.parser.schedule_parser import \
+    generate_full_availability
 from ime_usp_class_scheduler.parser.workload_parser import (get_teacher_id,
-                                                            parse_workload,
                                                             time_to_period)
 
 
@@ -58,3 +61,102 @@ def test_parse_workload():
     ]
     with open(TEST_FILE) as workload_file:
         assert parse_workload(workload_file) == expected
+
+
+def test_parse_schedule():
+    TEST_FILE = "tests/data/test_schedule.csv"
+    expected = [
+        TeacherData(
+            "pmiranda",
+            generate_full_availability() - {
+                # Segunda
+                ScheduleTimeslot(1, 1),
+                ScheduleTimeslot(1, 2),
+                # Quinta
+                ScheduleTimeslot(4, 3),
+            },
+            preferred_time={
+                # Quarta
+                ScheduleTimeslot(3, 1),
+                ScheduleTimeslot(3, 2),
+                ScheduleTimeslot(3, 3),
+                ScheduleTimeslot(3, 4),
+                # Quinta
+                ScheduleTimeslot(4, 1),
+                ScheduleTimeslot(4, 2),
+                # Sexta
+                ScheduleTimeslot(5, 1),
+                ScheduleTimeslot(5, 2),
+                ScheduleTimeslot(5, 3),
+                ScheduleTimeslot(5, 4),
+            },
+        ),
+        TeacherData(
+            "egbirgin",
+            generate_full_availability() - {
+                # Segunda
+                ScheduleTimeslot(1, 3),
+                ScheduleTimeslot(1, 4),
+                # Terça
+                ScheduleTimeslot(2, 3),
+                ScheduleTimeslot(2, 4),
+                # Quarta
+                ScheduleTimeslot(3, 3),
+                ScheduleTimeslot(3, 4),
+                # Quinta
+                ScheduleTimeslot(4, 3),
+                ScheduleTimeslot(4, 4),
+                # Sexta
+                ScheduleTimeslot(5, 1),
+                ScheduleTimeslot(5, 2),
+                ScheduleTimeslot(5, 3),
+                ScheduleTimeslot(5, 4),
+            },
+            preferred_time={
+                # Terça
+                ScheduleTimeslot(2, 1),
+                ScheduleTimeslot(2, 2),
+                # Quinta
+                ScheduleTimeslot(4, 1),
+                ScheduleTimeslot(4, 2),
+            },
+        ),
+        TeacherData(
+            "rt",
+            generate_full_availability() - {
+                # Segunda
+                ScheduleTimeslot(1, 1),
+                # Terça
+                ScheduleTimeslot(2, 1),
+                # Quarta
+                ScheduleTimeslot(3, 1),
+                # Quinta
+                ScheduleTimeslot(4, 1),
+                # Sexta
+                ScheduleTimeslot(5, 1),
+                ScheduleTimeslot(5, 2),
+                ScheduleTimeslot(5, 3),
+                ScheduleTimeslot(5, 4),
+            },
+            preferred_time={
+                # Segunda
+                ScheduleTimeslot(1, 2),
+                ScheduleTimeslot(1, 3),
+                ScheduleTimeslot(1, 4),
+                # Terça
+                ScheduleTimeslot(2, 2),
+                ScheduleTimeslot(2, 3),
+                ScheduleTimeslot(2, 4),
+                # Quarta
+                ScheduleTimeslot(3, 2),
+                ScheduleTimeslot(3, 3),
+                ScheduleTimeslot(3, 4),
+                # Quinta
+                ScheduleTimeslot(4, 2),
+                ScheduleTimeslot(4, 3),
+                ScheduleTimeslot(4, 4),
+            },
+        ),
+    ]
+    with open(TEST_FILE) as schedule_file:
+        assert parse_schedule(schedule_file) == expected

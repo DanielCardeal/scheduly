@@ -33,6 +33,18 @@ class CourseData:
     teacher_id: str
 
 
+@dataclass(frozen=True)
+class TeacherData:
+    """Information about availability and time preferences of a teacher.
+
+    The teacher ID must be an uniquely identifiable value.
+    """
+
+    teacher_id: str
+    available_time: set[ScheduleTimeslot]
+    preferred_time: set[ScheduleTimeslot]
+
+
 def time_to_period(time: dt.time) -> int:
     """
     Returns the time period that intersects a given time_input. If the time
