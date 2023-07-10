@@ -1,12 +1,17 @@
 import datetime as dt
 
-from ime_usp_class_scheduler.parser import (CourseData, ScheduleTimeslot,
-                                            TeacherData, parse_schedule,
-                                            parse_workload)
-from ime_usp_class_scheduler.parser.schedule_parser import \
-    generate_full_availability
-from ime_usp_class_scheduler.parser.workload_parser import (get_teacher_id,
-                                                            time_to_period)
+from ime_usp_class_scheduler.parser import (
+    CourseData,
+    ScheduleTimeslot,
+    TeacherData,
+    parse_schedule,
+    parse_workload,
+)
+from ime_usp_class_scheduler.parser.schedule_parser import generate_full_availability
+from ime_usp_class_scheduler.parser.workload_parser import (
+    get_teacher_id,
+    time_to_period,
+)
 
 
 def test_time_to_period():
@@ -28,8 +33,7 @@ def test_parse_workload():
     expected = [
         CourseData(
             "mac0329",
-            {ScheduleTimeslot(2, 1),
-             ScheduleTimeslot(4, 2)},
+            {ScheduleTimeslot(2, 1), ScheduleTimeslot(4, 2)},
             "BCC",
             "nina",
         ),
@@ -37,8 +41,7 @@ def test_parse_workload():
         CourseData("mac0101", {ScheduleTimeslot(2, 3)}, "BCC", "leliane"),
         CourseData(
             "mac0321",
-            {ScheduleTimeslot(5, 1),
-             ScheduleTimeslot(5, 2)},
+            {ScheduleTimeslot(5, 1), ScheduleTimeslot(5, 2)},
             "Poli EC - PCS 2",
             "ddm",
         ),
@@ -52,8 +55,7 @@ def test_parse_workload():
             "FEA 1",
             "pmiranda",
         ),
-        CourseData("mac2166", {ScheduleTimeslot(5, 4)}, "Poli Web C",
-                   "fujita"),
+        CourseData("mac2166", {ScheduleTimeslot(5, 4)}, "Poli Web C", "fujita"),
         CourseData("mac0113", set(), "FEA 1", "hirata"),
         CourseData("mac0320", set(), "BCC", "yoshiko"),
         CourseData("mac5770", set(), "BCC_POS", "yoshiko"),
@@ -68,7 +70,8 @@ def test_parse_schedule():
     expected = [
         TeacherData(
             "pmiranda",
-            generate_full_availability() - {
+            generate_full_availability()
+            - {
                 # Segunda
                 ScheduleTimeslot(1, 1),
                 ScheduleTimeslot(1, 2),
@@ -93,7 +96,8 @@ def test_parse_schedule():
         ),
         TeacherData(
             "egbirgin",
-            generate_full_availability() - {
+            generate_full_availability()
+            - {
                 # Segunda
                 ScheduleTimeslot(1, 3),
                 ScheduleTimeslot(1, 4),
@@ -123,7 +127,8 @@ def test_parse_schedule():
         ),
         TeacherData(
             "rt",
-            generate_full_availability() - {
+            generate_full_availability()
+            - {
                 # Segunda
                 ScheduleTimeslot(1, 1),
                 # Terça

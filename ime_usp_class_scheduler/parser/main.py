@@ -85,5 +85,4 @@ def get_teacher_id(teacher_email: str) -> str:
     teacher_email = teacher_email.lower()
     teacher_email = re.sub(r"[0-9.]", "", teacher_email)
     teacher_email = teacher_email.replace("-", "_")
-    return teacher_email[:teacher_email.find("@")]
-
+    return teacher_email[: teacher_email.find("@")]

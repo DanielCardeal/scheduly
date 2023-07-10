@@ -7,8 +7,7 @@ from .main import ScheduleTimeslot, TeacherData, get_teacher_id, time_to_period
 
 def generate_full_availability() -> set[ScheduleTimeslot]:
     """Generate a set with all the possible timeslots."""
-    return set(
-        ScheduleTimeslot(w, p) for w in range(1, 5) for p in range(1, 4))
+    return set(ScheduleTimeslot(w, p) for w in range(1, 5) for p in range(1, 4))
 
 
 def get_timeslots(weekday: int, input: str) -> set[ScheduleTimeslot]:
@@ -53,6 +52,5 @@ def parse_schedule(schedule_file: io.TextIOWrapper) -> list[TeacherData]:
         for i in range(7, 12):
             available_time -= get_timeslots(i - 6, row[i])
 
-        teachers.append(TeacherData(teacher_id, available_time,
-                                    preferred_time))
+        teachers.append(TeacherData(teacher_id, available_time, preferred_time))
     return teachers

@@ -31,8 +31,9 @@ def get_fixed_classes(fixed_classes_input: str) -> list[ScheduleTimeslot]:
     # Captures the triplet [weekday, class start time, class end time (if present)]
     FIXED_CLASS_REGEX = r"([2-6])a ([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?"
     fixed_classes = set()
-    for (weekday, start_time, end_time) in re.findall(FIXED_CLASS_REGEX,
-                                                      fixed_classes_input):
+    for weekday, start_time, end_time in re.findall(
+        FIXED_CLASS_REGEX, fixed_classes_input
+    ):
         weekday = int(weekday) - 1  # weekdays on the scheduler are repr. [1-5]
         periods = set()
 
@@ -76,6 +77,5 @@ def parse_workload(workload_file: io.TextIOWrapper) -> list[CourseData]:
                 group = "BCC_POS"
             else:
                 group = "BCC"
-            courses.append(
-                CourseData(course_id, fixed_classes, group, teacher_id))
+            courses.append(CourseData(course_id, fixed_classes, group, teacher_id))
     return courses
