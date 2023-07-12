@@ -1,31 +1,27 @@
 import datetime as dt
 
-from ime_usp_class_scheduler.parser import (
-    CourseData,
-    ScheduleTimeslot,
-    TeacherData,
-    parse_schedule,
-    parse_workload,
-)
-from ime_usp_class_scheduler.parser.schedule_parser import generate_full_availability
-from ime_usp_class_scheduler.parser.workload_parser import (
-    get_teacher_id,
-    time_to_period,
+from ime_usp_class_scheduler.model import CourseData, ScheduleTimeslot, TeacherData
+from ime_usp_class_scheduler.model.parsers.required import (
+    _generate_full_availability,
+    _get_teacher_id,
+    _time_to_period,
+    ime_parse_schedule,
+    ime_parse_workload,
 )
 
 
 def test_time_to_period():
-    assert time_to_period(dt.time(7, 40)) == -1
-    assert time_to_period(dt.time(8, 34)) == 1
-    assert time_to_period(dt.time(10, 00)) == 2
-    assert time_to_period(dt.time(15, 10)) == 3
-    assert time_to_period(dt.time(19, 00)) == -1
+    assert _time_to_period(dt.time(7, 40)) == -1
+    assert _time_to_period(dt.time(8, 34)) == 1
+    assert _time_to_period(dt.time(10, 00)) == 2
+    assert _time_to_period(dt.time(15, 10)) == 3
+    assert _time_to_period(dt.time(19, 00)) == -1
 
 
 def test_get_teacher_id():
-    assert get_teacher_id("alan-turing@linux.ime.usp.br") == "alan_turing"
-    assert get_teacher_id("13alan-turing@ime.usp.br") == "alan_turing"
-    assert get_teacher_id("AlanTuring22@google.com") == "alanturing"
+    assert _get_teacher_id("alan-turing@linux.ime.usp.br") == "alan_turing"
+    assert _get_teacher_id("13alan-turing@ime.usp.br") == "alan_turing"
+    assert _get_teacher_id("AlanTuring22@google.com") == "alanturing"
 
 
 def test_parse_workload():
@@ -62,7 +58,7 @@ def test_parse_workload():
         CourseData("mac0327", set(), "BCC", "mksilva"),
     ]
     with open(TEST_FILE) as workload_file:
-        assert parse_workload(workload_file) == expected
+        assert ime_parse_workload(workload_file) == expected
 
 
 def test_parse_schedule():
@@ -70,24 +66,24 @@ def test_parse_schedule():
     expected = [
         TeacherData(
             "pmiranda",
-            generate_full_availability()
+            _generate_full_availability()
             - {
-                # Segunda
+                # Monday
                 ScheduleTimeslot(1, 1),
                 ScheduleTimeslot(1, 2),
-                # Quinta
+                # Thursday
                 ScheduleTimeslot(4, 3),
             },
             preferred_time={
-                # Quarta
+                # Wednesday
                 ScheduleTimeslot(3, 1),
                 ScheduleTimeslot(3, 2),
                 ScheduleTimeslot(3, 3),
                 ScheduleTimeslot(3, 4),
-                # Quinta
+                # Thursday
                 ScheduleTimeslot(4, 1),
                 ScheduleTimeslot(4, 2),
-                # Sexta
+                # Friday
                 ScheduleTimeslot(5, 1),
                 ScheduleTimeslot(5, 2),
                 ScheduleTimeslot(5, 3),
@@ -96,67 +92,67 @@ def test_parse_schedule():
         ),
         TeacherData(
             "egbirgin",
-            generate_full_availability()
+            _generate_full_availability()
             - {
-                # Segunda
+                # Monday
                 ScheduleTimeslot(1, 3),
                 ScheduleTimeslot(1, 4),
-                # Terça
+                # Tuesday
                 ScheduleTimeslot(2, 3),
                 ScheduleTimeslot(2, 4),
-                # Quarta
+                # Wednesday
                 ScheduleTimeslot(3, 3),
                 ScheduleTimeslot(3, 4),
-                # Quinta
+                # Thursday
                 ScheduleTimeslot(4, 3),
                 ScheduleTimeslot(4, 4),
-                # Sexta
+                # Friday
                 ScheduleTimeslot(5, 1),
                 ScheduleTimeslot(5, 2),
                 ScheduleTimeslot(5, 3),
                 ScheduleTimeslot(5, 4),
             },
             preferred_time={
-                # Terça
+                # Tuesday
                 ScheduleTimeslot(2, 1),
                 ScheduleTimeslot(2, 2),
-                # Quinta
+                # Thursday
                 ScheduleTimeslot(4, 1),
                 ScheduleTimeslot(4, 2),
             },
         ),
         TeacherData(
             "rt",
-            generate_full_availability()
+            _generate_full_availability()
             - {
-                # Segunda
+                # Monday
                 ScheduleTimeslot(1, 1),
-                # Terça
+                # Tuesday
                 ScheduleTimeslot(2, 1),
-                # Quarta
+                # Wednesday
                 ScheduleTimeslot(3, 1),
-                # Quinta
+                # Thursday
                 ScheduleTimeslot(4, 1),
-                # Sexta
+                # Friday
                 ScheduleTimeslot(5, 1),
                 ScheduleTimeslot(5, 2),
                 ScheduleTimeslot(5, 3),
                 ScheduleTimeslot(5, 4),
             },
             preferred_time={
-                # Segunda
+                # Monday
                 ScheduleTimeslot(1, 2),
                 ScheduleTimeslot(1, 3),
                 ScheduleTimeslot(1, 4),
-                # Terça
+                # Tuesday
                 ScheduleTimeslot(2, 2),
                 ScheduleTimeslot(2, 3),
                 ScheduleTimeslot(2, 4),
-                # Quarta
+                # Wednesday
                 ScheduleTimeslot(3, 2),
                 ScheduleTimeslot(3, 3),
                 ScheduleTimeslot(3, 4),
-                # Quinta
+                # Thursday
                 ScheduleTimeslot(4, 2),
                 ScheduleTimeslot(4, 3),
                 ScheduleTimeslot(4, 4),
@@ -164,4 +160,4 @@ def test_parse_schedule():
         ),
     ]
     with open(TEST_FILE) as schedule_file:
-        assert parse_schedule(schedule_file) == expected
+        assert ime_parse_schedule(schedule_file) == expected
