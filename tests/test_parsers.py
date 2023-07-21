@@ -29,33 +29,33 @@ def test_parse_workload():
     expected = [
         CourseData(
             "mac0329",
-            {ScheduleTimeslot(2, 1), ScheduleTimeslot(4, 2)},
-            "BCC",
             "nina",
+            "BCC",
+            {ScheduleTimeslot(2, 1), ScheduleTimeslot(4, 2)},
         ),
-        CourseData("mac0499", set(), "BCC", "nina"),
-        CourseData("mac0101", {ScheduleTimeslot(2, 3)}, "BCC", "leliane"),
+        CourseData("mac0499", "nina", "BCC", set()),
+        CourseData("mac0101", "leliane", "BCC", {ScheduleTimeslot(2, 3)}),
         CourseData(
             "mac0321",
-            {ScheduleTimeslot(5, 1), ScheduleTimeslot(5, 2)},
-            "Poli EC - PCS 2",
             "ddm",
+            "Poli EC - PCS 2",
+            {ScheduleTimeslot(5, 1), ScheduleTimeslot(5, 2)},
         ),
         CourseData(
             "mac0113",
+            "pmiranda",
+            "FEA 1",
             {
                 ScheduleTimeslot(3, 1),
                 ScheduleTimeslot(5, 1),
                 ScheduleTimeslot(5, 2),
             },
-            "FEA 1",
-            "pmiranda",
         ),
-        CourseData("mac2166", {ScheduleTimeslot(5, 4)}, "Poli Web C", "fujita"),
-        CourseData("mac0113", set(), "FEA 1", "hirata"),
-        CourseData("mac0320", set(), "BCC", "yoshiko"),
-        CourseData("mac5770", set(), "BCC_POS", "yoshiko"),
-        CourseData("mac0327", set(), "BCC", "mksilva"),
+        CourseData("mac2166", "fujita", "Poli Web C", {ScheduleTimeslot(5, 4)}),
+        CourseData("mac0113", "hirata", "FEA 1", set()),
+        CourseData("mac0320", "yoshiko", "BCC", set()),
+        CourseData("mac5770", "yoshiko", "BCC_POS", set()),
+        CourseData("mac0327", "mksilva", "BCC", set()),
     ]
     with open(TEST_FILE) as workload_file:
         assert ime_parse_workload(workload_file) == expected

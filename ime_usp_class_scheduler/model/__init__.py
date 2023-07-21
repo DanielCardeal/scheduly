@@ -1,15 +1,20 @@
-from dataclasses import dataclass
+from attrs import field, frozen
 
 
-@dataclass(frozen=True, slots=True)
+@frozen(order=True)
 class ScheduleTimeslot:
     """Represents a timeslot on the schedule."""
 
-    weekday: int
-    period: int
+    weekday: int = field(converter=int)
+    period: int = field(converter=int)
+
+    @weekday.validator
+    def _validate_weekday(self, attribute, value):
+        if not 1 <= value <= 7:
+            raise ValueError("weekday must be between 1 and 7")
 
 
-@dataclass(frozen=True, slots=True)
+@frozen
 class CourseData:
     """Information about a course that should be scheduled by the class scheduler.
 
@@ -21,19 +26,19 @@ class CourseData:
     find adequate schedule periods for the remaining, not fixed, classes.
     """
 
-    course_id: str
-    fixed_classes: set[ScheduleTimeslot]
-    group: str
-    teacher_id: str
+    course_id: str = field(converter=str)
+    teacher_id: str = field(converter=str)
+    group: str = field(converter=str)
+    fixed_classes: set[ScheduleTimeslot] = field(converter=set)
 
 
-@dataclass(frozen=True, slots=True)
+@frozen
 class TeacherData:
     """Information about availability and time preferences of a teacher.
 
     The teacher ID must be an uniquely identifiable value.
     """
 
-    teacher_id: str
-    available_time: set[ScheduleTimeslot]
-    preferred_time: set[ScheduleTimeslot]
+    teacher_id: str = field(converter=str)
+    available_time: set[ScheduleTimeslot] = field(converter=set)
+    preferred_time: set[ScheduleTimeslot] = field(converter=set)

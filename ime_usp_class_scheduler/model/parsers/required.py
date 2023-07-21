@@ -150,7 +150,7 @@ def ime_parse_workload(workload_file: io.TextIOWrapper) -> list[CourseData]:
                 group = "BCC_POS"
             else:
                 group = "BCC"
-            courses.append(CourseData(course_id, fixed_classes, group, teacher_id))
+            courses.append(CourseData(course_id, teacher_id, group, fixed_classes))
     return courses
 
 
