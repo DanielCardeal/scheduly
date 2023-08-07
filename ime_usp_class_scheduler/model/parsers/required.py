@@ -21,8 +21,8 @@ def _get_timeslots(weekday: int, input: str) -> set[ScheduleTimeslot]:
 
     Example:
 
-    >>> _get_timeslots(2, "8:00-10:00;14:00-16:00")
-    {ScheduleTimeslot(weekday=2, period=1), ScheduleTimeslot(weekday=2, period=3)}
+    >>> sorted(_get_timeslots(2, "8:00-10:00;14:00-16:00"))
+    [ScheduleTimeslot(weekday=2, period=1), ScheduleTimeslot(weekday=2, period=3)]
     """
     if not input:
         return set()
