@@ -42,6 +42,9 @@ jobs:
       - name: Check imports with isort
         run: poetry run isort --check .
 
+      - name: Check types with mypy
+        run: poetry run mypy .
+
       - name: Run pytest tests
         run: poetry run pytest --doctest-modules -v
 
