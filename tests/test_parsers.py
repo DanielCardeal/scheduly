@@ -1,12 +1,23 @@
 import datetime as dt
 
-from ime_usp_class_scheduler.model import CourseData, ScheduleTimeslot, TeacherData
+from ime_usp_class_scheduler.model import (
+    CourseData,
+    CurriculaCoursesData,
+    CurriculaData,
+    JointClassData,
+    ScheduleTimeslot,
+    TeacherData,
+    WorkloadData,
+)
 from ime_usp_class_scheduler.model.parsers.required import (
     _generate_full_availability,
     _get_teacher_id,
     _time_to_period,
     ime_parse_schedule,
     ime_parse_workload,
+    parse_courses,
+    parse_curricula,
+    parse_joint,
 )
 
 
@@ -27,21 +38,21 @@ def test_get_teacher_id():
 def test_parse_workload():
     TEST_FILE = "tests/data/test_workload.csv"
     expected = [
-        CourseData(
+        WorkloadData(
             "mac0329",
             "nina",
             "BCC",
             {ScheduleTimeslot(2, 1), ScheduleTimeslot(4, 2)},
         ),
-        CourseData("mac0499", "nina", "BCC", set()),
-        CourseData("mac0101", "leliane", "BCC", {ScheduleTimeslot(2, 3)}),
-        CourseData(
+        WorkloadData("mac0499", "nina", "BCC", set()),
+        WorkloadData("mac0101", "leliane", "BCC", {ScheduleTimeslot(2, 3)}),
+        WorkloadData(
             "mac0321",
             "ddm",
             "Poli EC - PCS 2",
             {ScheduleTimeslot(5, 1), ScheduleTimeslot(5, 2)},
         ),
-        CourseData(
+        WorkloadData(
             "mac0113",
             "pmiranda",
             "FEA 1",
@@ -51,11 +62,11 @@ def test_parse_workload():
                 ScheduleTimeslot(5, 2),
             },
         ),
-        CourseData("mac2166", "fujita", "Poli Web C", {ScheduleTimeslot(5, 4)}),
-        CourseData("mac0113", "hirata", "FEA 1", set()),
-        CourseData("mac0320", "yoshiko", "BCC", set()),
-        CourseData("mac5770", "yoshiko", "BCC_POS", set()),
-        CourseData("mac0327", "mksilva", "BCC", set()),
+        WorkloadData("mac2166", "fujita", "Poli Web C", {ScheduleTimeslot(5, 4)}),
+        WorkloadData("mac0113", "hirata", "FEA 1", set()),
+        WorkloadData("mac0320", "yoshiko", "BCC", set()),
+        WorkloadData("mac5770", "yoshiko", "BCC_POS", set()),
+        WorkloadData("mac0327", "mksilva", "BCC", set()),
     ]
     with open(TEST_FILE) as workload_file:
         assert ime_parse_workload(workload_file) == expected
@@ -161,3 +172,38 @@ def test_parse_schedule():
     ]
     with open(TEST_FILE) as schedule_file:
         assert ime_parse_schedule(schedule_file) == expected
+
+
+def test_parse_curricula():
+    CURRICULA_FILE = "tests/data/test_curricula.csv"
+    COMPONENTS_FILE = "tests/data/test_curricula_components.csv"
+    expected = [
+        CurriculaData(
+            "data_science",
+            "BCC",
+            {
+                CurriculaCoursesData("MACXXXX", True),
+                CurriculaCoursesData("MACYYYY", False),
+            },
+        ),
+        CurriculaData("statistics", "BCC", {CurriculaCoursesData("MACYYYY", True)}),
+    ]
+    with open(CURRICULA_FILE) as cur_f, open(COMPONENTS_FILE) as comp_f:
+        assert parse_curricula(cur_f, comp_f) == expected
+
+
+def test_parse_courses():
+    TEST_FILE = "tests/data/test_courses.csv"
+    expected = [
+        CourseData("MACXXXX", 2, False, "BCC", 1),
+        CourseData("MACYYYY", 4, True, "POS", -1),
+    ]
+    with open(TEST_FILE) as f:
+        assert parse_courses(f) == expected
+
+
+def test_parse_joint():
+    JOINT_FILE = "tests/data/test_joint.csv"
+    expected = [JointClassData("MACXXXX", "MACYYYY")]
+    with open(JOINT_FILE) as f:
+        assert parse_joint(f) == expected

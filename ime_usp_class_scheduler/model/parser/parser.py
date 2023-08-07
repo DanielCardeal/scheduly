@@ -3,7 +3,17 @@ import datetime as dt
 import io
 import re
 
-from ime_usp_class_scheduler.model import CourseData, ScheduleTimeslot, TeacherData
+import pandas as pd  # type: ignore[import]
+
+from ime_usp_class_scheduler.model import (
+    CourseData,
+    CurriculaCoursesData,
+    CurriculaData,
+    JointClassData,
+    ScheduleTimeslot,
+    TeacherData,
+    WorkloadData,
+)
 
 
 class ParserException(Exception):
@@ -130,10 +140,130 @@ def _get_fixed_classes(fixed_classes_input: str) -> set[ScheduleTimeslot]:
     return fixed_classes
 
 
-def ime_parse_workload(workload_file: io.TextIOWrapper) -> list[CourseData]:
+def _load_data_with_checks(
+    file: io.TextIOWrapper, *, dtypes: dict[str, type], index: str | list[str]
+) -> pd.DataFrame:
+    """Read CSV data of file into a pandas DataFrame, checking the integrity of
+    the underlying data. The dtypes argument is a dictionary of header name -> column type.
+
+    Raises a ParserException if:
+        + The CSV file doesn't conform to the expected header (aka CSV header != dtypes.keys())
+        + The CSV file doesn't respect the column's dtypes
+        + The index has duplicated values. Note: if the index is a list, treat
+          it like a pandas MultiIndex.
+    """
+    data = pd.read_csv(file)
+
+    expected_header = set(dtypes.keys())
+    if set(data.columns) != expected_header:
+        raise ParserException(
+            f"Input file '{file.name}' header doesn't conform to the expected format. "
+            f"Expected: {expected_header}, got: {set(data.columns)}"
+        )
+
+    try:
+        data.astype(dtypes, copy=False)
+    except ValueError as e:
+        raise ParserException(
+            f"Type mismatch in value of input file '{file.name}'.\nError: {e}"
+        )
+
+    if (duplicates := data.duplicated(index)).any():
+        raise ParserException(
+            f"Input file '{file.name}' has repeated, possibly conflicting, data:\n "
+            f"{data[duplicates]}"
+        )
+
+    return data
+
+
+def parse_courses(courses_file: io.TextIOWrapper) -> list[CourseData]:
+    course_data = _load_data_with_checks(
+        courses_file,
+        dtypes={
+            "course_id": str,
+            "num_classes": int,
+            "is_double": bool,
+            "group": str,
+            "ideal_period": int,
+        },
+        index="course_id",
+    )
+
+    courses = []
+    for _, course in course_data.iterrows():
+        courses.append(
+            CourseData(
+                course.course_id,
+                course.num_classes,
+                course.is_double,
+                course.group,
+                course.ideal_period,
+            )
+        )
+    return courses
+
+
+def parse_joint(joint_file: io.TextIOWrapper) -> list[JointClassData]:
+    joint_data = _load_data_with_checks(
+        joint_file,
+        dtypes={
+            "course_id_A": str,
+            "course_id_B": str,
+        },
+        index=["course_id_A", "course_id_B"],
+    )
+
+    return [
+        JointClassData(joint.course_id_A, joint.course_id_B)
+        for _, joint in joint_data.iterrows()
+    ]
+
+
+def parse_curricula(
+    curricula_file: io.TextIOWrapper, curricula_comp_file: io.TextIOWrapper
+) -> list[CurriculaData]:
+    curricula_data = _load_data_with_checks(
+        curricula_file,
+        dtypes={"curriculum_id": str, "group": str},
+        index="curriculum_id",
+    )
+    components_data = _load_data_with_checks(
+        curricula_comp_file,
+        dtypes={"curriculum_id": str, "course_id": str, "is_required": bool},
+        index=["course_id", "curriculum_id"],
+    )
+
+    if (
+        inconsistent := ~components_data.curriculum_id.isin(
+            curricula_data.curriculum_id
+        )
+    ).any():
+        raise ParserException(
+            "Curricula components has courses associated with non-existing curricula: "
+            f"{components_data[inconsistent].curriculum_id.unique()}. "
+            f"Faulty lines are:\n{components_data[inconsistent]} "
+        )
+
+    # Collect curricula
+    curricula: list[CurriculaData] = []
+    for _, curriculum in curricula_data.iterrows():
+        mask = components_data.curriculum_id == curriculum.curriculum_id
+        courses = {
+            CurriculaCoursesData(component.course_id, component.is_required)
+            for _, component in components_data[mask].iterrows()
+        }
+        curricula.append(
+            CurriculaData(curriculum.curriculum_id, curriculum.group, courses)
+        )
+
+    return curricula
+
+
+def ime_parse_workload(workload_file: io.TextIOWrapper) -> list[WorkloadData]:
     """
     Parse a CSV file containing the semester workload and extract the
-    corresponding CourseData.
+    corresponding WorkloadData.
     """
     courses = []
     csv_reader = csv.reader(workload_file)
@@ -150,7 +280,7 @@ def ime_parse_workload(workload_file: io.TextIOWrapper) -> list[CourseData]:
                 group = "BCC_POS"
             else:
                 group = "BCC"
-            courses.append(CourseData(course_id, teacher_id, group, fixed_classes))
+            courses.append(WorkloadData(course_id, teacher_id, group, fixed_classes))
     return courses
 
 

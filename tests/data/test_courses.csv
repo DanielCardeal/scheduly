@@ -1,0 +1,3 @@
+course_id,num_classes,is_double,group,ideal_period
+MACXXXX,2,False,BCC,1
+MACYYYY,4,True,POS,-1
