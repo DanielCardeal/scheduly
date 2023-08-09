@@ -1,6 +1,6 @@
 import datetime as dt
 
-from ime_usp_class_scheduler.model import (
+from ime_usp_class_scheduler.model.data import (
     CourseData,
     CurriculaCoursesData,
     CurriculaData,
@@ -9,7 +9,7 @@ from ime_usp_class_scheduler.model import (
     TeacherData,
     WorkloadData,
 )
-from ime_usp_class_scheduler.model.parsers.required import (
+from ime_usp_class_scheduler.parser import (
     _generate_full_availability,
     _get_teacher_id,
     _time_to_period,

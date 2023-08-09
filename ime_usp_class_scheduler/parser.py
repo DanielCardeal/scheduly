@@ -5,7 +5,7 @@ import re
 
 import pandas as pd  # type: ignore[import]
 
-from ime_usp_class_scheduler.model import (
+from ime_usp_class_scheduler.model.data import (
     CourseData,
     CurriculaCoursesData,
     CurriculaData,
