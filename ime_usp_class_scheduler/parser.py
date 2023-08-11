@@ -27,7 +27,7 @@ def _generate_full_availability() -> set[ScheduleTimeslot]:
 
 def _get_timeslots(weekday: int, input: str) -> set[ScheduleTimeslot]:
     """Extract timeslots for a given weekday using the time information stored
-    in the input string. Only the starting periods are considered.
+    in the input string
 
     Example:
 
@@ -49,7 +49,7 @@ def _get_timeslots(weekday: int, input: str) -> set[ScheduleTimeslot]:
 
 def _time_to_period(time: dt.time) -> int:
     """
-    Returns the time period that intersects a given time_input. If the time
+    Return the time period that intersects a given time_input. If the time
     period doesn't match any time periods, returns -1.
 
     >>> _time_to_period(dt.time(7, 40))
@@ -143,8 +143,10 @@ def _get_fixed_classes(fixed_classes_input: str) -> set[ScheduleTimeslot]:
 def _load_data_with_checks(
     file: io.TextIOWrapper, *, dtypes: dict[str, type], index: str | list[str]
 ) -> pd.DataFrame:
-    """Read CSV data of file into a pandas DataFrame, checking the integrity of
-    the underlying data. The dtypes argument is a dictionary of header name -> column type.
+    """Read CSV data of a file into a pandas DataFrame, checking the integrity
+    of the underlying data.
+
+    The dtypes argument is a mapping from (header name) -> (column type).
 
     Raises a ParserException if:
         + The CSV file doesn't conform to the expected header (aka CSV header != dtypes.keys())
@@ -178,6 +180,7 @@ def _load_data_with_checks(
 
 
 def parse_courses(courses_file: io.TextIOWrapper) -> list[CourseData]:
+    """Parse course data from the courses CSV input file."""
     course_data = _load_data_with_checks(
         courses_file,
         dtypes={
@@ -205,6 +208,7 @@ def parse_courses(courses_file: io.TextIOWrapper) -> list[CourseData]:
 
 
 def parse_joint(joint_file: io.TextIOWrapper) -> list[JointClassData]:
+    """Parse joint classes data from the joint CSV input file."""
     joint_data = _load_data_with_checks(
         joint_file,
         dtypes={
@@ -223,6 +227,10 @@ def parse_joint(joint_file: io.TextIOWrapper) -> list[JointClassData]:
 def parse_curricula(
     curricula_file: io.TextIOWrapper, curricula_comp_file: io.TextIOWrapper
 ) -> list[CurriculaData]:
+    """
+    Parse curricula data from the curricula and curricula components CSV input
+    files.
+    """
     curricula_data = _load_data_with_checks(
         curricula_file,
         dtypes={"curriculum_id": str, "group": str},
@@ -261,10 +269,7 @@ def parse_curricula(
 
 
 def ime_parse_workload(workload_file: io.TextIOWrapper) -> list[WorkloadData]:
-    """
-    Parse a CSV file containing the semester workload and extract the
-    corresponding WorkloadData.
-    """
+    """Parse semestral workload data from the teacher workload CSV input file."""
     courses = []
     csv_reader = csv.reader(workload_file)
     _ = next(csv_reader)  # remove header
@@ -285,10 +290,7 @@ def ime_parse_workload(workload_file: io.TextIOWrapper) -> list[WorkloadData]:
 
 
 def ime_parse_schedule(schedule_file: io.TextIOWrapper) -> list[TeacherData]:
-    """
-    Parse a CSV file containing the teachers' schedule and extract the
-    corresponding TeacherData.
-    """
+    """Parse teacher's data from the teacher schedule CSV input file."""
     teachers = []
     csv_reader = csv.reader(schedule_file)
     _ = next(csv_reader)  # remove header
