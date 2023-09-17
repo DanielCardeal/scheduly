@@ -1,5 +1,3 @@
-import datetime as dt
-
 from ime_usp_class_scheduler.model.data import (
     CourseData,
     CurriculaCoursesData,
@@ -11,28 +9,12 @@ from ime_usp_class_scheduler.model.data import (
 )
 from ime_usp_class_scheduler.parser import (
     _generate_full_availability,
-    _get_teacher_id,
-    _time_to_period,
     ime_parse_schedule,
     ime_parse_workload,
     parse_courses,
     parse_curricula,
     parse_joint,
 )
-
-
-def test_time_to_period():
-    assert _time_to_period(dt.time(7, 40)) == -1
-    assert _time_to_period(dt.time(8, 34)) == 1
-    assert _time_to_period(dt.time(10, 00)) == 2
-    assert _time_to_period(dt.time(15, 10)) == 3
-    assert _time_to_period(dt.time(19, 00)) == -1
-
-
-def test_get_teacher_id():
-    assert _get_teacher_id("alan-turing@linux.ime.usp.br") == "alan_turing"
-    assert _get_teacher_id("13alan-turing@ime.usp.br") == "alan_turing"
-    assert _get_teacher_id("AlanTuring22@google.com") == "alanturing"
 
 
 def test_parse_workload():
