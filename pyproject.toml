@@ -1,10 +1,14 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "ime-usp-class-scheduler"
 version = "0.1.0"
 description = ""
 authors = ["Daniel Pessoa Cardeal <danielpessoa.cardeal@gmail.com>"]
 readme = "README.md"
-packages = [{include = "ime_usp_class_scheduler"}]
+packages = [{include = "ime_usp_class_scheduler", from = "src/py"}]
 
 [tool.poetry.scripts]
 scheduler = "ime_usp_class_scheduler.main:main"
@@ -24,7 +28,3 @@ pytest = "^7.4.0"
 
 [tool.isort]
 profile = 'black'
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"

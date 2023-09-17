@@ -1,6 +1,7 @@
 import logging
 
 import click
+from ime_usp_class_scheduler.interface.cli import CliInterface
 
 
 @click.group()
@@ -44,6 +45,9 @@ def cli(num_models, time_limit, threads):
         logging.info(f"Number of threads: {threads}")
 
     logging.info(f"Time limit: {time_limit} seconds")
+
+    interface = CliInterface(num_models=num_models, n_threads=threads)
+    print(*sorted(interface.asp_inputs), sep=".\n")
 
 
 if __name__ == "__main__":
