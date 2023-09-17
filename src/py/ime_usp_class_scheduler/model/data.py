@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Protocol
+from typing import Any, Protocol
 
 from attrs import field, frozen, validators
 from clingo.symbol import Function, Number, String, Symbol
@@ -75,7 +75,7 @@ class ScheduleTimeslot:
     period: int = field(validator=validators.instance_of(int))
 
     @weekday.validator
-    def _validate_weekday(self, attribute, value):
+    def _validate_weekday(self, _: Any, value: int) -> None:
         if not 1 <= value <= 7:
             raise ValueError("weekday must be between 1 and 7")
 

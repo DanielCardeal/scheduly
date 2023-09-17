@@ -17,7 +17,7 @@ from ime_usp_class_scheduler.parser import (
 )
 
 
-def test_parse_workload():
+def test_parse_workload() -> None:
     TEST_FILE = "tests/data/test_workload.csv"
     expected = [
         WorkloadData(
@@ -54,7 +54,7 @@ def test_parse_workload():
         assert ime_parse_workload(workload_file) == expected
 
 
-def test_parse_schedule():
+def test_parse_schedule() -> None:
     TEST_FILE = "tests/data/test_schedule.csv"
     expected = [
         TeacherData(
@@ -156,7 +156,7 @@ def test_parse_schedule():
         assert ime_parse_schedule(schedule_file) == expected
 
 
-def test_parse_curricula():
+def test_parse_curricula() -> None:
     CURRICULA_FILE = "tests/data/test_curricula.csv"
     COMPONENTS_FILE = "tests/data/test_curricula_components.csv"
     expected = [
@@ -174,7 +174,7 @@ def test_parse_curricula():
         assert parse_curricula(cur_f, comp_f) == expected
 
 
-def test_parse_courses():
+def test_parse_courses() -> None:
     TEST_FILE = "tests/data/test_courses.csv"
     expected = [
         CourseData("MACXXXX", 2, False, "BCC", 1),
@@ -184,7 +184,7 @@ def test_parse_courses():
         assert parse_courses(f) == expected
 
 
-def test_parse_joint():
+def test_parse_joint() -> None:
     JOINT_FILE = "tests/data/test_joint.csv"
     expected = [JointClassData("MACXXXX", "MACYYYY")]
     with open(JOINT_FILE) as f:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import os
+from pathlib import Path
 
 from clingo import Control, Symbol
 
@@ -41,8 +41,8 @@ class CliInterface:
         """Import data on INPUT_DIR using the appropriate parsers."""
         input_data: list[ASPData] = []
 
-        def input_fpath(fname):
-            return os.path.join(INPUT_DIR, fname)
+        def input_fpath(fname: str) -> Path:
+            return INPUT_DIR.joinpath(fname)
 
         with open(input_fpath("courses.csv")) as f:
             input_data += parse_courses(f)

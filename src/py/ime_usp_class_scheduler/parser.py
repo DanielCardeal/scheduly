@@ -3,7 +3,8 @@ import datetime as dt
 import io
 import re
 
-import pandas as pd  # type: ignore[import]
+import pandas as pd
+
 from ime_usp_class_scheduler.model.data import (
     CourseData,
     CurriculaCoursesData,

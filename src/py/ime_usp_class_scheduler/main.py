@@ -1,6 +1,8 @@
 import logging
+from pathlib import Path
 
 import click
+
 from ime_usp_class_scheduler.interface.cli import CliInterface
 
 
@@ -12,7 +14,7 @@ from ime_usp_class_scheduler.interface.cli import CliInterface
     default="class_scheduler.log",
     help="custom path to LOG file",
 )
-def main(log_file):
+def main(log_file: Path) -> None:
     logging.basicConfig(
         filename=log_file,
         filemode="w",
@@ -36,7 +38,7 @@ def main(log_file):
     help="number of threads to use for solving. "
     "A value of 0 or less uses all of the threads available in the system.",
 )
-def cli(num_models, time_limit, threads):
+def cli(num_models: int, time_limit: int, threads: int) -> None:
     logging.info(f"Number of models: {num_models}")
 
     if threads == 1:

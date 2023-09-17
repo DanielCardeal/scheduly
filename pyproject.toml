@@ -28,3 +28,14 @@ pytest = "^7.4.0"
 
 [tool.isort]
 profile = 'black'
+known_first_party = ['ime_usp_class_scheduler']
+
+[tool.black]
+line-length = 88
+
+[tool.mypy]
+plugins = [
+    'numpy.typing.mypy_plugin'
+]
+ignore_missing_imports = true
+strict = true
