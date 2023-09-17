@@ -76,17 +76,13 @@ def _get_teacher_id(teacher_email: str) -> str:
     """Extract a teacher id from their e-mail address.
 
     The teachers' id is defined by everything before the domain address of their
-    e-mails, transformed to lowercase. The function removes both punctuation and
-    numbers from the teacher's e-mail, preventing
+    e-mails.
 
     >>> _get_teacher_id("alan-turing@linux.ime.usp.br")
-    'alan_turing'
+    'alan-turing'
     >>> _get_teacher_id("AlanTuring22@google.com")
-    'alanturing'
+    'AlanTuring22'
     """
-    teacher_email = teacher_email.lower()
-    teacher_email = re.sub(r"[0-9.]", "", teacher_email)
-    teacher_email = teacher_email.replace("-", "_")
     return teacher_email[: teacher_email.find("@")]
 
 
