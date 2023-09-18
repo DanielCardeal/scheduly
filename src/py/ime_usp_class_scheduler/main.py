@@ -4,7 +4,7 @@ from typing import Optional
 
 import click
 
-from ime_usp_class_scheduler.interface.cli import Configuration
+from ime_usp_class_scheduler.interface.cli import CliInterface, Configuration
 
 
 @click.group()
@@ -62,11 +62,16 @@ def cli(
 
     logging.info(f"Time limit: {time_limit} seconds")
 
-    configuration = Configuration(
-        preset, num_models=num_models, time_limit=time_limit, threads=threads
-    )
-    print(configuration)
-    # print(*sorted(interface.asp_inputs), sep=".\n")
+    try:
+        configuration = Configuration(
+            preset, num_models=num_models, time_limit=time_limit, threads=threads
+        )
+        interface = CliInterface(configuration)
+    except Exception as e:
+        print(e)
+        exit(1)
+
+    print(interface.program)
 
 
 if __name__ == "__main__":

@@ -2,12 +2,17 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Optional
-from attrs import define
 
 import tomli
 from clingo import Control, Symbol
 
-from ime_usp_class_scheduler.constants import INPUT_DIR, PRESETS_DIR
+from ime_usp_class_scheduler.constants import (
+    CONSTRAINTS_DIR,
+    HARD_CONSTRAINTS_DIR,
+    INPUT_DIR,
+    PRESETS_DIR,
+    SOFT_CONSTRAINTS_DIR,
+)
 from ime_usp_class_scheduler.model.data import ASPData
 from ime_usp_class_scheduler.parser import (
     ime_parse_schedule,
@@ -18,9 +23,9 @@ from ime_usp_class_scheduler.parser import (
 )
 
 
-@define
 class Configuration:
     """Represents the user configuration of the scheduler program"""
+
     preset: str
     num_models: int
     time_limit: int
@@ -67,6 +72,8 @@ class Configuration:
 
 
 class CliInterface:
+    _MODEL_BASE_PATHS = ["aliases", "base"]
+
     def __init__(self, configuration: Configuration):
         self.configuration = configuration
 
@@ -76,7 +83,20 @@ class CliInterface:
         self.ctl.configuration.solve.models = configuration.num_models  # type: ignore[union-attr]
         self.ctl.configuration.solve.parallel_mode = configuration.threads  # type: ignore[union-attr]
 
+        # Build ASP program
+        def header(header: str) -> str:
+            return f"\n% --- {header.upper()} --- \n"
+
+        program = ""
+
         self.raw_inputs = self._load_inputs()
+        program += header("inputs")
+        program += "\n".join([str(i) + "." for i in self.asp_inputs])
+
+        program += header("model")
+        program += self._load_model()
+
+        self.program = program
 
     @property
     def asp_inputs(self) -> list[Symbol]:
@@ -112,3 +132,26 @@ class CliInterface:
             input_data += ime_parse_workload(wf)
 
         return input_data
+
+    def _load_model(self) -> str:
+        """Load the ASP model (base + hard and soft constraints) based on user configuration."""
+        model = ""
+
+        paths = [
+            CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp")
+            for path in self._MODEL_BASE_PATHS
+        ]
+        paths += [
+            HARD_CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp")
+            for path in self.configuration.hard_constraints
+        ]
+        paths += [
+            SOFT_CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp")
+            for path in self.configuration.soft_constraints
+        ]
+
+        for path in paths:
+            with open(path) as f:
+                model += f.read() + "\n"
+
+        return model
