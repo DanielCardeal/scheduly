@@ -1,9 +1,10 @@
 import logging
 from pathlib import Path
+from typing import Optional
 
 import click
 
-from ime_usp_class_scheduler.interface.cli import CliInterface
+from ime_usp_class_scheduler.interface.cli import Configuration
 
 
 @click.group()
@@ -27,18 +28,31 @@ def main(log_file: Path) -> None:
 
 
 @main.command()
-@click.option("-n", "--num-models", default=1, help="number of models to be generated")
 @click.option(
-    "-t", "--time-limit", default=500, help="limit execution time to <n> seconds."
+    "-p",
+    "--preset",
+    default="default",
+    help="filename (without extension) of TOML preset file.",
+)
+@click.option(
+    "-n", "--num-models", required=False, help="number of models to be generated"
+)
+@click.option(
+    "-t", "--time-limit", required=False, help="limit execution time to <n> seconds."
 )
 @click.option(
     "-j",
     "--threads",
-    default=1,
+    required=False,
     help="number of threads to use for solving. "
     "A value of 0 or less uses all of the threads available in the system.",
 )
-def cli(num_models: int, time_limit: int, threads: int) -> None:
+def cli(
+    preset: str,
+    num_models: Optional[int],
+    time_limit: Optional[int],
+    threads: Optional[int],
+) -> None:
     logging.info(f"Number of models: {num_models}")
 
     if threads == 1:
@@ -48,8 +62,11 @@ def cli(num_models: int, time_limit: int, threads: int) -> None:
 
     logging.info(f"Time limit: {time_limit} seconds")
 
-    interface = CliInterface(num_models=num_models, n_threads=threads)
-    print(*sorted(interface.asp_inputs), sep=".\n")
+    configuration = Configuration(
+        preset, num_models=num_models, time_limit=time_limit, threads=threads
+    )
+    print(configuration)
+    # print(*sorted(interface.asp_inputs), sep=".\n")
 
 
 if __name__ == "__main__":
