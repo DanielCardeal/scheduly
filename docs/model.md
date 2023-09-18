@@ -25,7 +25,6 @@ This page lists and explains all of the predicates and values used within the pr
 
 ## Predicates
 
-
 ### Courses' information
 
 + `course/5(course id, course group, number of weekly classes, ideal period, is double)`
@@ -55,11 +54,11 @@ This page lists and explains all of the predicates and values used within the pr
 
   Identifies a teacher in the scheduler
 
-+ available/3(teacher id, weekday, period)
++ `available/3(teacher id, weekday, period)`
 
   Indicates which day/period a teacher is available to teach.
 
-+ preferred/3(teacher id, weekday, period)
++ `preferred/3(teacher id, weekday, period)`
 
   Indicates preferred lecture day/period of a teacher
 
@@ -71,7 +70,19 @@ This page lists and explains all of the predicates and values used within the pr
   there could be multiple instances for a same course/offering group, which
   means more than one teacher is assigned to the same class.
 
-+ `class/5(course id, offering group, teacher id, weekday, period)`
++ `class/4(course id, offering group, weekday, period)`
 
   Schedule a class of a given course to a weekday
 
++ `conflict/6(first course id, first course group, second course group, second course group, weekday, period)`
+
+  Register schedule conflicts between two different courses or two different offerings of the same course. Conflicts occur when two classes occur in the same period and weekday.
+  
+### Aliases
+
+This predicates don't add information about the model, but they facilitate
+writing rules in a more concise manner. 
+
++ `num_classes/2(course id, number of weekly classes)`
++ `is_double/1(course id)`
++ `is_undergrad/1(course id)`
