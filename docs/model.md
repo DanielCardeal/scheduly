@@ -96,3 +96,4 @@ writing rules in a more concise manner.
 + `num_classes/2(course id, number of weekly classes)`
 + `is_double/1(course id)`
 + `is_undergrad/1(course id)`
++ `conflict/4(course A id, course A group, course B id, course B group)`

@@ -12,3 +12,13 @@ is_double(Course) :- course(Course, _, _, _, 1).
 def is_undergrad/1(course_id)
 *%
 is_undergrad(Course) :- course(Course, "grad", _, _, _).
+
+%*
+def conflict/4(
+    course A id,
+    course A group,
+    course B id,
+    course B group,
+)
+*%
+conflict(CourseA, GroupA, CourseB, GroupB) :- conflict(CourseA, GroupA, CourseB, GroupB, _, _).

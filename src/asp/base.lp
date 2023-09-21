@@ -23,12 +23,12 @@ def class/4(
 
 %*
 def conflict/6(
-    first course id,
-    first course group,
-    second course group,
-    second course group,
-    weekday,
-    period
+    course A id,
+    course A group,
+    course B id,
+    course B group,
+    conflict weekday,
+    conflict period
 )
 *%
 % Class conflict
@@ -48,7 +48,7 @@ conflict(Course1, Group1, Course2, Group2, Weekday, Period) :-
 Two classes taught by the same teacher cannot be in conflict with eachother,
 unless they are jointed.
 *%
-:- conflict(CourseA, GroupA, CourseB, GroupB, _, _),
+:- conflict(CourseA, GroupA, CourseB, GroupB),
     lecturer(CourseA, GroupA, Teacher),
     lecturer(CourseB, GroupB, Teacher),
     not joint(CourseA, CourseB).
