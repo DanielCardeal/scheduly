@@ -174,4 +174,6 @@ class CurriculaCoursesData:
 
 def generate_full_availability() -> set[ScheduleTimeslot]:
     """Generate a set with all the possible timeslots."""
-    return set(ScheduleTimeslot(w, p) for w in range(1, 5) for p in range(1, 4))
+    return set(ScheduleTimeslot(w, p) for w in range(1, 6) for p in range(1, 5))
+
+
