@@ -23,7 +23,7 @@ def main(log_file: Path) -> None:
         encoding="utf-8",
         level=logging.INFO,
         format="%(asctime)s %(levelname)s: %(message)s",
-        datefmt="%b %d %H:%m:%S",
+        datefmt="%b %d %H:%m",
     )
     click.echo(f'Logging to "{log_file}"')
 
