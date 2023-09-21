@@ -14,6 +14,11 @@ def is_undergrad/1(course_id)
 is_undergrad(Course) :- course(Course, "grad", _, _, _).
 
 %*
+def is_obligatory/1(course id)
+*%
+is_obligatory(Course) :- curriculum_component("obligatory", Course, _).
+
+%*
 def conflict/4(
     course A id,
     course A group,
