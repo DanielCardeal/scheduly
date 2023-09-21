@@ -38,9 +38,9 @@ class Configuration:
         self,
         preset: str,
         /,
-        num_models: Optional[int],
-        time_limit: Optional[int],
-        threads: Optional[int],
+        num_models: Optional[int] = None,
+        time_limit: Optional[int] = None,
+        threads: Optional[int] = None,
     ) -> None:
         self.preset = preset
 
