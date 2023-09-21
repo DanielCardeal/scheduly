@@ -25,6 +25,16 @@ This page lists and explains all of the predicates and values used within the pr
 
 ## Predicates
 
+### Timetable information
+
++ `weekday/1(weekday id)`
+
+  Registers a weekday that is available for scheduling classes.
+
++ `period/1(period id)`
+
+  Register a period that is available for scheduling classes.
+
 ### Courses' information
 
 + `course/5(course id, course group, number of weekly classes, ideal period, is double)`

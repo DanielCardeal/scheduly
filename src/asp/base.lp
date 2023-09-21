@@ -1,4 +1,14 @@
 %*
+def weekday/1(weekday id)
+*%
+weekday(1..5).
+
+%*
+def period/1(period id)
+*%
+period(1..4).
+
+%*
 def class/4(
     course id,
     offering group,
@@ -6,8 +16,9 @@ def class/4(
     period
 )
 *%
-{ class(Course, Group, Weekday, Period) : lecturer(Course, Group, Teacher), available(Teacher, Weekday, Period) } == NumClasses :-
-    num_classes(Course, NumClasses).
+{ class(Course, Group, W, P): weekday(W), period(P) } == NumClasses :-
+    num_classes(Course, NumClasses),
+    lecturer(Course, Group, _).
 
 
 %*
