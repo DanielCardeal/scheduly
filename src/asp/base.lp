@@ -60,3 +60,5 @@ Classes must respect the lecturer(s)' available times.
 :- class(Course, Group, Weekday, Period),
     lecturer(Course, Group, Teacher),
     not available(Teacher, Weekday, Period).
+
+#show class/4.
