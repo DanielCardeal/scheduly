@@ -25,6 +25,10 @@ from ime_usp_class_scheduler.parser import (
     parse_joint,
 )
 
+_MODEL_BASE_PATHS = [
+    CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp") for path in ("aliases", "base")
+]
+
 
 class CliInterface:
     _MODEL_BASE_PATHS = ["aliases", "base"]
@@ -68,8 +72,8 @@ class CliInterface:
         Import data from INPUT_DIR using the appropriate parsers.
 
         This function might add some extra information that is implied by the
-        data loaded from the parsers, such as add availability for teachers
-        with no available teaching periods.
+        data loaded from the parsers, for example, it adds full availability
+        for teachers with no available teaching periods.
         """
         input_data: list[ASPData] = []
 
@@ -96,14 +100,15 @@ class CliInterface:
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Unable to find required input file {e.filename}.")
 
-        # Add missing availability times for course lecturers
+        # Add full availability for lecturers without availability information
+        full_availability = generate_full_availability()
+
         lecturers = set()
         for teacher in input_data:
             match teacher:
                 case WorkloadData(teacher_id=teacher_id):
                     lecturers.add(teacher_id)
 
-        full_availability = generate_full_availability()
         for idx, teacher in enumerate(input_data):
             if not isinstance(teacher, TeacherData):
                 continue
@@ -125,10 +130,7 @@ class CliInterface:
         model = ""
 
         # Load constraints
-        paths: list[Path] = [
-            CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp")
-            for path in self._MODEL_BASE_PATHS
-        ]
+        paths: list[Path] = _MODEL_BASE_PATHS.copy()
         paths += [
             HARD_CONSTRAINTS_DIR.joinpath(constraint_cfg.path)
             for constraint_cfg in self.configuration.constraints.hard
