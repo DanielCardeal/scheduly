@@ -96,7 +96,7 @@ class CliInterface:
 
         self.raw_inputs = self._load_inputs()
         program += header("inputs")
-        program += "\n".join([str(i) + "." for i in self.asp_inputs])
+        program += self.asp_inputs
 
         program += header("model")
         program += self._load_model()
@@ -104,13 +104,9 @@ class CliInterface:
         self.program = program
 
     @property
-    def asp_inputs(self) -> list[Symbol]:
-        """Return the ASP representation of the raw input data."""
-        return [
-            asp_string
-            for raw_input in self.raw_inputs
-            for asp_string in raw_input.to_asp()
-        ]
+    def asp_inputs(self) -> str:
+        """Return the ASP code representation of the raw input data."""
+        return "\n".join((raw_input.to_asp() for raw_input in self.raw_inputs))
 
     def _load_inputs(self) -> list[ASPData]:
         """

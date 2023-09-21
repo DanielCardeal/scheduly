@@ -9,8 +9,8 @@ from clingo.symbol import Function, Number, String, Symbol
 class ASPData(Protocol):
     """Protocol of all classes that can be converted to ASP"""
 
-    def to_asp(self) -> list[Symbol]:
-        """Convert instance of the object to its ASP symbol representation."""
+    def to_asp(self) -> str:
+        """Convert instance of the object to its ASP code representation."""
         ...
 
 
@@ -24,9 +24,9 @@ class CourseData:
     group: str = field(converter=str)
     ideal_period: int = field(validator=validators.instance_of(int))
 
-    def to_asp(self) -> list[Symbol]:
+    def to_asp(self) -> str:
         """Convert self into a course/5 ASP predicate."""
-        return [
+        asp_list = [
             Function(
                 "course",
                 [
@@ -38,6 +38,7 @@ class CourseData:
                 ],
             )
         ]
+        return _asp_list_to_str(asp_list)
 
 
 @frozen
@@ -48,7 +49,7 @@ class TeacherData:
     available_time: set[ScheduleTimeslot] = field(validator=validators.instance_of(set))
     preferred_time: set[ScheduleTimeslot] = field(validator=validators.instance_of(set))
 
-    def to_asp(self) -> list[Symbol]:
+    def to_asp(self) -> str:
         """Convert self into teacher/1, available/3 and preferred/3 ASP predicates."""
         available = [
             Function(
@@ -64,7 +65,7 @@ class TeacherData:
             )
             for t in self.preferred_time
         ]
-        return available + preferred
+        return _asp_list_to_str(available + preferred)
 
 
 @frozen(order=True)
@@ -96,7 +97,7 @@ class WorkloadData:
     offering_group: str = field(converter=str)
     fixed_classes: set[ScheduleTimeslot] = field(validator=validators.instance_of(set))
 
-    def to_asp(self) -> list[Symbol]:
+    def to_asp(self) -> str:
         """Convert self into lecturer/3 and class/5 ASP predicates."""
         lectures = Function(
             "lecturer",
@@ -106,21 +107,23 @@ class WorkloadData:
                 String(self.teacher_id),
             ],
         )
+        lectures_str = _asp_list_to_str([lectures])
+
         fixed = [
             Function(
                 "class",
                 [
                     String(self.course_id),
                     String(self.offering_group),
-                    String(self.teacher_id),
                     Number(t.weekday),
                     Number(t.period),
                 ],
             )
             for t in self.fixed_classes
         ]
+        fixed_str = "\n".join([f":- not {cl}." for cl in fixed])
 
-        return [lectures] + fixed
+        return lectures_str + "\n" + fixed_str
 
 
 @frozen
@@ -130,9 +133,11 @@ class JointClassData:
     course_id_A: str = field(converter=str)
     course_id_B: str = field(converter=str)
 
-    def to_asp(self) -> list[Symbol]:
+    def to_asp(self) -> str:
         "Convert self into a joint/2 ASP predicate."
-        return [Function("joint", [String(self.course_id_A), String(self.course_id_B)])]
+        return _asp_list_to_str(
+            [Function("joint", [String(self.course_id_A), String(self.course_id_B)])]
+        )
 
 
 @frozen
@@ -143,7 +148,7 @@ class CurriculaData:
     group: str = field(converter=str)
     courses: set[CurriculaCoursesData] = field(validator=validators.instance_of(set))
 
-    def to_asp(self) -> list[Symbol]:
+    def to_asp(self) -> str:
         """Convert self into curriculum/3 and curriculum_component/3 ASP predicates."""
         curriculum = Function(
             "curriculum", [String(self.curriculum_id), String(self.group)]
@@ -159,7 +164,7 @@ class CurriculaData:
             )
             for data in self.courses
         ]
-        return [curriculum] + curriculum_components
+        return _asp_list_to_str([curriculum] + curriculum_components)
 
 
 @frozen
@@ -177,3 +182,6 @@ def generate_full_availability() -> set[ScheduleTimeslot]:
     return set(ScheduleTimeslot(w, p) for w in range(1, 6) for p in range(1, 5))
 
 
+def _asp_list_to_str(asp_list: list[Symbol]) -> str:
+    """Converts a list of ASP symbols to an ASP code string."""
+    return "\n".join([str(sym) + "." for sym in asp_list])
