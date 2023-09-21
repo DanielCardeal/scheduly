@@ -58,6 +58,11 @@ class CliInterface:
         """Return the ASP code representation of the raw input data."""
         return "\n".join((raw_input.to_asp() for raw_input in self.raw_inputs))
 
+    def save_model(self, output_path: Path) -> None:
+        """Write compiled ASP model (inputs and constraints) to a file."""
+        with open(output_path, "w") as f:
+            f.write(self.program)
+
     def _load_inputs(self) -> list[ASPData]:
         """
         Import data from INPUT_DIR using the appropriate parsers.
@@ -142,12 +147,8 @@ class CliInterface:
 
         # Setup weights and and priorities
         for soft_cfg in self.configuration.constraints.soft:
-            weight = (
-                f"#const w_{soft_cfg.name} = {soft_cfg.weight}.\n"
-            )
-            priority = (
-                f"#const p_{soft_cfg.name} = {soft_cfg.priority}.\n"
-            )
+            weight = f"#const w_{soft_cfg.name} = {soft_cfg.weight}.\n"
+            priority = f"#const p_{soft_cfg.name} = {soft_cfg.priority}.\n"
             model += weight + priority
 
         return model

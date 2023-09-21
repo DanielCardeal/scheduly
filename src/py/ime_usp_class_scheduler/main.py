@@ -48,18 +48,27 @@ def main(log_file: Path) -> None:
     help="number of threads to use for solving. "
     "A value of 0 or less uses all of the threads available in the system.",
 )
+@click.option(
+    "--save-model",
+    "model_out_path",
+    required=False,
+    help="Save underlying clingo program - with inputs - to {file}.",
+    type=click.Path(file_okay=True, dir_okay=False),
+)
 def cli(
     preset: str,
     num_models: Optional[int],
     time_limit: Optional[int],
     threads: Optional[int],
+    model_out_path: Optional[Path],
 ) -> None:
     configuration = load_preset(
         preset, num_models=num_models, time_limit=time_limit, threads=threads
     )
     interface = CliInterface(configuration)
 
-    print(interface.program)
+    if model_out_path is not None:
+        interface.save_model(model_out_path)
 
 
 if __name__ == "__main__":
