@@ -1,14 +1,14 @@
-[clingo_options]
+[clingo]
 num_models = 1
 time_limit = -1
 threads = 4
 
 [constraints]
 hard = [
-    "double",
-    "no_friday_afternoon",
-    "no_obligatory_conflicts",
-    "no_same_day",
+    { name = "double" },
+    { name = "no_friday_afternoon" },
+    { name = "no_obligatory_conflicts" },
+    { name = "no_same_day" },
 ]
 
 soft = [

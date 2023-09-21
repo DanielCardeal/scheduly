@@ -4,7 +4,8 @@ from typing import Optional
 
 import click
 
-from ime_usp_class_scheduler.interface.cli import CliInterface, Configuration
+from ime_usp_class_scheduler.interface.cli import CliInterface
+from ime_usp_class_scheduler.interface.configuration import load_preset
 
 
 @click.group()
@@ -53,16 +54,7 @@ def cli(
     time_limit: Optional[int],
     threads: Optional[int],
 ) -> None:
-    logging.info(f"Number of models: {num_models}")
-
-    if threads == 1:
-        logging.warn("Using only 1 thread. Solving performance may be low.")
-    else:
-        logging.info(f"Number of threads: {threads}")
-
-    logging.info(f"Time limit: {time_limit} seconds")
-
-    configuration = Configuration(
+    configuration = load_preset(
         preset, num_models=num_models, time_limit=time_limit, threads=threads
     )
     interface = CliInterface(configuration)

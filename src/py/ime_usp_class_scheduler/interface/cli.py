@@ -1,18 +1,16 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Optional
 
-import tomli
-from clingo import Control, Symbol
+from clingo import Control
 
 from ime_usp_class_scheduler.constants import (
     CONSTRAINTS_DIR,
     HARD_CONSTRAINTS_DIR,
     INPUT_DIR,
-    PRESETS_DIR,
     SOFT_CONSTRAINTS_DIR,
 )
+from ime_usp_class_scheduler.interface.configuration import Configuration
 from ime_usp_class_scheduler.model.data import (
     ASPData,
     TeacherData,
@@ -28,59 +26,6 @@ from ime_usp_class_scheduler.parser import (
 )
 
 
-class Configuration:
-    """Represents the user configuration of the scheduler program"""
-
-    preset: str
-    num_models: int
-    time_limit: int
-    threads: int
-
-    hard_constraints: list[str]
-    soft_constraints: list[dict[str, Any]]
-
-    def __init__(
-        self,
-        preset: str,
-        /,
-        num_models: Optional[int] = None,
-        time_limit: Optional[int] = None,
-        threads: Optional[int] = None,
-    ) -> None:
-        self.preset = preset
-
-        preset_filepath = PRESETS_DIR.joinpath(self.preset).with_suffix(".toml")
-        try:
-            with open(preset_filepath, "rb") as f:
-                config = tomli.load(f)
-        except tomli.TOMLDecodeError as e:
-            raise Exception(f"TOML syntax error in prest file {preset_filepath}:\n{e}")
-        except FileNotFoundError as e:
-            raise Exception(f"Unable to find preset file {preset_filepath}.")
-
-        match config:
-            case {
-                "clingo_options": {
-                    "num_models": preset_num_models,
-                    "time_limit": preset_time_limit,
-                    "threads": preset_threads,
-                },
-                "constraints": {
-                    "hard": [*hard_constraints],
-                    "soft": [*soft_constraints],
-                },
-            }:
-                self.num_models = preset_num_models if not num_models else num_models
-                self.time_limit = preset_time_limit if not time_limit else time_limit
-                self.threads = preset_threads if not threads else threads
-                self.hard_constraints = hard_constraints
-                self.soft_constraints = soft_constraints
-            case _:
-                raise ValueError(
-                    f"Invalid preset configuration file ({preset_filepath}):\n{config}"
-                )
-
-
 class CliInterface:
     _MODEL_BASE_PATHS = ["aliases", "base"]
 
@@ -90,8 +35,8 @@ class CliInterface:
         # Set clingo options
         self.ctl = Control()
         self.ctl.configuration.solve.opt_mode = "optN"  # type: ignore[union-attr]
-        self.ctl.configuration.solve.models = configuration.num_models  # type: ignore[union-attr]
-        self.ctl.configuration.solve.parallel_mode = configuration.threads  # type: ignore[union-attr]
+        self.ctl.configuration.solve.models = configuration.clingo.num_models  # type: ignore[union-attr]
+        self.ctl.configuration.solve.parallel_mode = configuration.clingo.threads  # type: ignore[union-attr]
 
         # Build ASP program
         def header(header: str) -> str:
@@ -180,12 +125,12 @@ class CliInterface:
             for path in self._MODEL_BASE_PATHS
         ]
         paths += [
-            HARD_CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp")
-            for path in self.configuration.hard_constraints
+            HARD_CONSTRAINTS_DIR.joinpath(constraint_cfg.path)
+            for constraint_cfg in self.configuration.constraints.hard
         ]
         paths += [
-            SOFT_CONSTRAINTS_DIR.joinpath(soft_constraint["name"]).with_suffix(".lp")
-            for soft_constraint in self.configuration.soft_constraints
+            SOFT_CONSTRAINTS_DIR.joinpath(constraint_cfg.path)
+            for constraint_cfg in self.configuration.constraints.soft
         ]
 
         try:
@@ -196,12 +141,12 @@ class CliInterface:
             raise FileNotFoundError(f"Unable to find constraint file {e.filename}.")
 
         # Setup weights and and priorities
-        for soft_constraint in self.configuration.soft_constraints:
+        for soft_cfg in self.configuration.constraints.soft:
             weight = (
-                f"#const w_{soft_constraint['name']} = {soft_constraint['weight']}.\n"
+                f"#const w_{soft_cfg.name} = {soft_cfg.weight}.\n"
             )
             priority = (
-                f"#const p_{soft_constraint['name']} = {soft_constraint['priority']}.\n"
+                f"#const p_{soft_cfg.name} = {soft_cfg.priority}.\n"
             )
             model += weight + priority
 
