@@ -125,22 +125,25 @@ class CliInterface:
         def input_fpath(fname: str) -> Path:
             return INPUT_DIR.joinpath(fname)
 
-        with open(input_fpath("courses.csv")) as f:
-            input_data += parse_courses(f)
+        try:
+            with open(input_fpath("courses.csv")) as f:
+                input_data += parse_courses(f)
 
-        with open(input_fpath("curricula.csv")) as cf, open(
-            input_fpath("curricula_components.csv")
-        ) as ccf:
-            input_data += parse_curricula(cf, ccf)
+            with open(input_fpath("curricula.csv")) as cf, open(
+                input_fpath("curricula_components.csv")
+            ) as ccf:
+                input_data += parse_curricula(cf, ccf)
 
-        with open(input_fpath("joint.csv")) as jf:
-            input_data += parse_joint(jf)
+            with open(input_fpath("joint.csv")) as jf:
+                input_data += parse_joint(jf)
 
-        with open(input_fpath("schedule.csv")) as wf:
-            input_data += ime_parse_schedule(wf)
+            with open(input_fpath("schedule.csv")) as wf:
+                input_data += ime_parse_schedule(wf)
 
-        with open(input_fpath("workload.csv")) as wf:
-            input_data += ime_parse_workload(wf)
+            with open(input_fpath("workload.csv")) as wf:
+                input_data += ime_parse_workload(wf)
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"Unable to find required input file {e.filename}.")
 
         # Add missing availability times for course lecturers
         lecturers = set()
@@ -183,8 +186,11 @@ class CliInterface:
             for path in self.configuration.soft_constraints
         ]
 
-        for path in paths:
-            with open(path) as f:
-                model += f.read() + "\n"
+        try:
+            for path in paths:
+                with open(path) as f:
+                    model += f.read() + "\n"
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"Unable to find constraint file {e.filename}.")
 
         return model
