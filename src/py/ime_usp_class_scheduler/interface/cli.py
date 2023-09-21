@@ -56,6 +56,7 @@ class CliInterface:
         program += self._load_model()
 
         self.program = program
+        self.ctl.add(self.program)
 
     @property
     def asp_inputs(self) -> str:
@@ -66,6 +67,24 @@ class CliInterface:
         """Write compiled ASP model (inputs and constraints) to a file."""
         with open(output_path, "w") as f:
             f.write(self.program)
+
+    def run(self) -> None:
+        """Search for solutions using Clingo."""
+        self.ctl.ground()
+        with self.ctl.solve(yield_=True, async_=True) as handler:  # type: ignore[union-attr]
+            while True:
+                handler.resume()
+                _ = handler.wait(0.001)
+                model = handler.model()
+                if model is not None:
+                    print(f"Current optimization: {model.cost}")
+                    print(model)
+                else:
+                    result = handler.get()
+                    print(result)
+                    if result.unsatisfiable:
+                        print(f"Failure because of {handler.core()}")
+                    break
 
     def _load_inputs(self) -> list[ASPData]:
         """

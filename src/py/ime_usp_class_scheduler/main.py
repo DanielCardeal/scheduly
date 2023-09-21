@@ -70,6 +70,8 @@ def cli(
     if model_out_path is not None:
         interface.save_model(model_out_path)
 
+    interface.run()
+
 
 if __name__ == "__main__":
     main()
