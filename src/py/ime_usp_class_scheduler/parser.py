@@ -13,16 +13,12 @@ from ime_usp_class_scheduler.model.data import (
     ScheduleTimeslot,
     TeacherData,
     WorkloadData,
+    generate_full_availability,
 )
 
 
 class ParserException(Exception):
     """Exception raised when an error occurs during the parsing of CSV input files."""
-
-
-def _generate_full_availability() -> set[ScheduleTimeslot]:
-    """Generate a set with all the possible timeslots."""
-    return set(ScheduleTimeslot(w, p) for w in range(1, 5) for p in range(1, 4))
 
 
 def _get_timeslots(weekday: int, input: str) -> set[ScheduleTimeslot]:
@@ -298,7 +294,7 @@ def ime_parse_schedule(schedule_file: io.TextIOWrapper) -> list[TeacherData]:
         for i in range(2, 7):
             preferred_time = preferred_time.union(_get_timeslots(i - 1, row[i]))
 
-        available_time = _generate_full_availability()
+        available_time = generate_full_availability()
         for i in range(7, 12):
             available_time -= _get_timeslots(i - 6, row[i])
 

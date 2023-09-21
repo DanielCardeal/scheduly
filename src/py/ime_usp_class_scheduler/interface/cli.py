@@ -13,7 +13,12 @@ from ime_usp_class_scheduler.constants import (
     PRESETS_DIR,
     SOFT_CONSTRAINTS_DIR,
 )
-from ime_usp_class_scheduler.model.data import ASPData
+from ime_usp_class_scheduler.model.data import (
+    ASPData,
+    TeacherData,
+    WorkloadData,
+    generate_full_availability,
+)
 from ime_usp_class_scheduler.parser import (
     ime_parse_schedule,
     ime_parse_workload,
@@ -108,7 +113,13 @@ class CliInterface:
         ]
 
     def _load_inputs(self) -> list[ASPData]:
-        """Import data on INPUT_DIR using the appropriate parsers."""
+        """
+        Import data from INPUT_DIR using the appropriate parsers.
+
+        This function might add some extra information that is implied by the
+        data loaded from the parsers, such as add availability for teachers
+        with no available teaching periods.
+        """
         input_data: list[ASPData] = []
 
         def input_fpath(fname: str) -> Path:
@@ -130,6 +141,28 @@ class CliInterface:
 
         with open(input_fpath("workload.csv")) as wf:
             input_data += ime_parse_workload(wf)
+
+        # Add missing availability times for course lecturers
+        lecturers = set()
+        for teacher in input_data:
+            match teacher:
+                case WorkloadData(teacher_id=teacher_id):
+                    lecturers.add(teacher_id)
+
+        full_availability = generate_full_availability()
+        for idx, teacher in enumerate(input_data):
+            if not isinstance(teacher, TeacherData):
+                continue
+            elif len(teacher.available_time) > 0:
+                lecturers.remove(teacher.teacher_id)
+            else:
+                input_data[idx] = TeacherData(
+                    teacher.teacher_id, full_availability, teacher.preferred_time
+                )
+                lecturers.remove(teacher.teacher_id)
+
+        for teacher_id in lecturers:  # Teachers with no associated TeacherData
+            input_data.append(TeacherData(teacher_id, full_availability, set()))
 
         return input_data
 

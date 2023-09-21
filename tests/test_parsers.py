@@ -6,9 +6,9 @@ from ime_usp_class_scheduler.model.data import (
     ScheduleTimeslot,
     TeacherData,
     WorkloadData,
+    generate_full_availability,
 )
 from ime_usp_class_scheduler.parser import (
-    _generate_full_availability,
     ime_parse_schedule,
     ime_parse_workload,
     parse_courses,
@@ -59,7 +59,7 @@ def test_parse_schedule() -> None:
     expected = [
         TeacherData(
             "pmiranda",
-            _generate_full_availability()
+            generate_full_availability()
             - {
                 # Monday
                 ScheduleTimeslot(1, 1),
@@ -85,7 +85,7 @@ def test_parse_schedule() -> None:
         ),
         TeacherData(
             "egbirgin",
-            _generate_full_availability()
+            generate_full_availability()
             - {
                 # Monday
                 ScheduleTimeslot(1, 3),
@@ -116,7 +116,7 @@ def test_parse_schedule() -> None:
         ),
         TeacherData(
             "rt",
-            _generate_full_availability()
+            generate_full_availability()
             - {
                 # Monday
                 ScheduleTimeslot(1, 1),
