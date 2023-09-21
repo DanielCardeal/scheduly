@@ -108,8 +108,7 @@ def _get_fixed_classes(fixed_classes_input: str) -> set[ScheduleTimeslot]:
     for weekday, start_time, end_time in re.findall(
         FIXED_CLASS_REGEX, fixed_classes_input
     ):
-        # TODO: parse correctly Saturday and Sunday
-        weekday = int(weekday) - 1  # weekdays on the scheduler are repr. [1-7]
+        weekday = int(weekday) - 1  # weekdays on the scheduler are repr. [1-5]
         periods = set()
 
         start_time = dt.datetime.strptime(start_time, "%H:%M")

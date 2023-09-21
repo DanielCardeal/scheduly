@@ -91,7 +91,6 @@ class WorkloadData:
     periods for the remaining classes.
     """
 
-    # TODO: implement multiple teachers for one class
     course_id: str = field(converter=str)
     teacher_id: str = field(converter=str)
     offering_group: str = field(converter=str)
