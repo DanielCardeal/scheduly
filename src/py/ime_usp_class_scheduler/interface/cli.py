@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import tomli
 from clingo import Control, Symbol
@@ -37,7 +37,7 @@ class Configuration:
     threads: int
 
     hard_constraints: list[str]
-    soft_constraints: list[str]
+    soft_constraints: list[dict[str, Any]]
 
     def __init__(
         self,
@@ -49,9 +49,14 @@ class Configuration:
     ) -> None:
         self.preset = preset
 
-        preset_filepath = PRESETS_DIR.joinpath(preset).with_suffix(".toml")
-        with open(preset_filepath, "rb") as f:
-            config = tomli.load(f)
+        preset_filepath = PRESETS_DIR.joinpath(self.preset).with_suffix(".toml")
+        try:
+            with open(preset_filepath, "rb") as f:
+                config = tomli.load(f)
+        except tomli.TOMLDecodeError as e:
+            raise Exception(f"TOML syntax error in prest file {preset_filepath}:\n{e}")
+        except FileNotFoundError as e:
+            raise Exception(f"Unable to find preset file {preset_filepath}.")
 
         match config:
             case {
@@ -169,7 +174,8 @@ class CliInterface:
         """Load the ASP model (base + hard and soft constraints) based on user configuration."""
         model = ""
 
-        paths = [
+        # Load constraints
+        paths: list[Path] = [
             CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp")
             for path in self._MODEL_BASE_PATHS
         ]
@@ -178,8 +184,8 @@ class CliInterface:
             for path in self.configuration.hard_constraints
         ]
         paths += [
-            SOFT_CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp")
-            for path in self.configuration.soft_constraints
+            SOFT_CONSTRAINTS_DIR.joinpath(soft_constraint["name"]).with_suffix(".lp")
+            for soft_constraint in self.configuration.soft_constraints
         ]
 
         try:
@@ -188,5 +194,15 @@ class CliInterface:
                     model += f.read() + "\n"
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Unable to find constraint file {e.filename}.")
+
+        # Setup weights and and priorities
+        for soft_constraint in self.configuration.soft_constraints:
+            weight = (
+                f"#const w_{soft_constraint['name']} = {soft_constraint['weight']}.\n"
+            )
+            priority = (
+                f"#const p_{soft_constraint['name']} = {soft_constraint['priority']}.\n"
+            )
+            model += weight + priority
 
         return model

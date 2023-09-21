@@ -11,4 +11,6 @@ hard = [
     "no_same_day",
 ]
 
-soft = []
+soft = [
+    {name = 'avoid_all_conflicts', weight = 1 , priority = 0}
+]

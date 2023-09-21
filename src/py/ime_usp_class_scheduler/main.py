@@ -62,14 +62,10 @@ def cli(
 
     logging.info(f"Time limit: {time_limit} seconds")
 
-    try:
-        configuration = Configuration(
-            preset, num_models=num_models, time_limit=time_limit, threads=threads
-        )
-        interface = CliInterface(configuration)
-    except Exception as e:
-        print(e)
-        exit(1)
+    configuration = Configuration(
+        preset, num_models=num_models, time_limit=time_limit, threads=threads
+    )
+    interface = CliInterface(configuration)
 
     print(interface.program)
 
