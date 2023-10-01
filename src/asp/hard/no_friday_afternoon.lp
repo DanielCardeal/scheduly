@@ -1,7 +1,7 @@
 %*
 Undergrad classes should not be offered on friday afternoon.
 *%
-:- class(Course, _, 5, Period),
+:- class(Course, _, 4, Period),
     is_undergrad(Course),
-    Period > 2.
+    Period > 1.
 

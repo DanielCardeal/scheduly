@@ -1,12 +1,12 @@
 %*
 def weekday/1(weekday id)
 *%
-weekday(1..5).
+weekday(0..5).
 
 %*
 def period/1(period id)
 *%
-period(1..4).
+period(0..3).
 
 %*
 def class/4(
