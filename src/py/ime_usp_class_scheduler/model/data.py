@@ -4,7 +4,9 @@ from enum import Enum
 from typing import Protocol
 
 from attrs import field, frozen, validators
+from clingo import SymbolType
 from clingo.symbol import Function, Number, String, Symbol
+from typing_extensions import Self
 
 
 class IntoASP(Protocol):
@@ -12,6 +14,14 @@ class IntoASP(Protocol):
 
     def into_asp(self) -> str:
         """Convert instance of the object to its ASP code representation."""
+        ...
+
+
+class FromASP(Protocol):
+    """Objects that can be parsed from an ASP symbol."""
+
+    @classmethod
+    def from_asp(cls, symbol: Symbol) -> Self:
         ...
 
 
@@ -228,6 +238,67 @@ def generate_full_availability() -> set[ScheduleTimeslot]:
     return set(ScheduleTimeslot(w, p) for w in Weekday for p in Period)
 
 
+@frozen
+class ClassData:
+    """Information about a scheduled class in a ASP model."""
+
+    course_id: str
+    group: str
+    weekday: Weekday
+    period: Period
+
+    @classmethod
+    def from_asp(cls, symbol: Symbol) -> Self:
+        assert (
+            symbol.type is SymbolType.Function and symbol.name == "class"
+        ), f"Unable to construct ClassData object from the given symbol: {str(symbol)}"
+        course_id = symbol.arguments[0].string
+        group = symbol.arguments[1].string
+        weekday = Weekday(symbol.arguments[2].number)
+        period = Period(symbol.arguments[3].number)
+        return cls(course_id, group, weekday, period)
+
+
+@frozen
+class ConflictData:
+    """Information about conflicting classes in a ASP model."""
+
+    course_id_a: str
+    group_id_a: str
+    course_id_b: str
+    group_id_b: str
+    weekday: Weekday
+    period: Period
+
+    @classmethod
+    def from_asp(cls, symbol: Symbol) -> Self:
+        assert (
+            symbol.type is SymbolType.Function and symbol.name == "conflict"
+        ), f"Unable to construct ConflictData object from the given symbol: {str(symbol)}"
+        course_id_a = symbol.arguments[0].string
+        group_id_a = symbol.arguments[1].string
+        course_id_b = symbol.arguments[2].string
+        group_id_b = symbol.arguments[3].string
+        weekday = Weekday(symbol.arguments[4].number)
+        period = Period(symbol.arguments[5].number)
+        return cls(course_id_a, group_id_a, course_id_b, group_id_b, weekday, period)
+
+
+@frozen
+class JointedData:
+    """Information about jointed courses in an ASP model."""
+
+    course_id_a: str
+    course_id_b: str
+
+    @classmethod
+    def from_asp(cls, symbol: Symbol) -> Self:
+        assert (
+            symbol.type is SymbolType.Function and symbol.name == "jointed"
+        ), f"Unable to construct JointedData object from the given symbol: {str(symbol)}"
+        course_id_a = symbol.arguments[0].string
+        course_id_b = symbol.arguments[1].string
+        return cls(course_id_a, course_id_b)
 
 
 def _asp_list_to_str(asp_list: list[Symbol]) -> str:
