@@ -4,13 +4,17 @@ from pathlib import Path
 
 from clingo import Control
 
+from ime_usp_class_scheduler import view
 from ime_usp_class_scheduler.constants import (
     CONSTRAINTS_DIR,
     HARD_CONSTRAINTS_DIR,
     INPUT_DIR,
     SOFT_CONSTRAINTS_DIR,
 )
-from ime_usp_class_scheduler.interface.configuration import Configuration
+from ime_usp_class_scheduler.interface.configuration import (
+    Configuration,
+    ConfigurationException,
+)
 from ime_usp_class_scheduler.model.data import (
     IntoASP,
     TeacherData,
@@ -24,17 +28,25 @@ from ime_usp_class_scheduler.parser import (
     parse_curricula,
     parse_joint,
 )
+from ime_usp_class_scheduler.view import ModelView
 
-_MODEL_BASE_PATHS = [
+MODEL_BASE_PATHS = [
     CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp") for path in ("aliases", "base")
 ]
 
 
 class CliInterface:
-    _MODEL_BASE_PATHS = ["aliases", "base"]
-
     def __init__(self, configuration: Configuration):
         self.configuration = configuration
+
+        # Load model viewer
+        try:
+            viewer_cls = getattr(view, self.configuration.viewer)
+            self.viewer: ModelView = viewer_cls()
+        except AttributeError:
+            raise ConfigurationException(
+                f"Unable to load '{self.configuration.viewer}' viewer."
+            )
 
         # Set clingo options
         self.ctl = Control()
@@ -71,20 +83,7 @@ class CliInterface:
     def run(self) -> None:
         """Search for solutions using Clingo."""
         self.ctl.ground()
-        with self.ctl.solve(yield_=True, async_=True) as handler:  # type: ignore[union-attr]
-            while True:
-                handler.resume()
-                _ = handler.wait(0.001)
-                model = handler.model()
-                if model is not None:
-                    print(f"Current optimization: {model.cost}")
-                    print(model)
-                else:
-                    result = handler.get()
-                    print(result)
-                    if result.unsatisfiable:
-                        print(f"Failure because of {handler.core()}")
-                    break
+        _ = self.ctl.solve(on_model=self.viewer.show_model)
 
     def _load_inputs(self) -> list[IntoASP]:
         """
@@ -149,7 +148,7 @@ class CliInterface:
         model = ""
 
         # Load constraints
-        paths: list[Path] = _MODEL_BASE_PATHS.copy()
+        paths: list[Path] = MODEL_BASE_PATHS.copy()
         paths += [
             HARD_CONSTRAINTS_DIR.joinpath(constraint_cfg.path)
             for constraint_cfg in self.configuration.constraints.hard

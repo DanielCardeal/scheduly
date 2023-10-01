@@ -1,3 +1,5 @@
+viewer = 'CliTabulateView'
+
 [clingo]
 num_models = 1
 time_limit = -1
