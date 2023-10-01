@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from typing import Any, Protocol
 from enum import Enum
+from typing import Protocol
 
 from attrs import field, frozen, validators
 from clingo.symbol import Function, Number, String, Symbol
 
 
-class ASPData(Protocol):
-    """Protocol of all classes that can be converted to ASP"""
+class IntoASP(Protocol):
+    """Objects that can be converted into an ASP code string."""
 
-    def to_asp(self) -> str:
+    def into_asp(self) -> str:
         """Convert instance of the object to its ASP code representation."""
         ...
 
@@ -68,7 +68,7 @@ class CourseData:
     group: str = field(converter=str)
     ideal_period: int = field(validator=validators.instance_of(int))
 
-    def to_asp(self) -> str:
+    def into_asp(self) -> str:
         """Convert self into a course/5 ASP predicate."""
         asp_list = [
             Function(
@@ -93,7 +93,7 @@ class TeacherData:
     available_time: set[ScheduleTimeslot] = field(validator=validators.instance_of(set))
     preferred_time: set[ScheduleTimeslot] = field(validator=validators.instance_of(set))
 
-    def to_asp(self) -> str:
+    def into_asp(self) -> str:
         """Convert self into teacher/1, available/3 and preferred/3 ASP predicates."""
         available = [
             Function(
@@ -143,7 +143,7 @@ class WorkloadData:
     offering_group: str = field(converter=str)
     fixed_classes: set[ScheduleTimeslot] = field(validator=validators.instance_of(set))
 
-    def to_asp(self) -> str:
+    def into_asp(self) -> str:
         """Convert self into lecturer/3 and class/5 ASP predicates."""
         lectures = Function(
             "lecturer",
@@ -179,7 +179,7 @@ class JointClassData:
     course_id_A: str = field(converter=str)
     course_id_B: str = field(converter=str)
 
-    def to_asp(self) -> str:
+    def into_asp(self) -> str:
         "Convert self into a joint/2 ASP predicate."
         return _asp_list_to_str(
             [Function("joint", [String(self.course_id_A), String(self.course_id_B)])]
@@ -194,7 +194,7 @@ class CurriculaData:
     group: str = field(converter=str)
     courses: set[CurriculaCoursesData] = field(validator=validators.instance_of(set))
 
-    def to_asp(self) -> str:
+    def into_asp(self) -> str:
         """Convert self into curriculum/3 and curriculum_component/3 ASP predicates."""
         curriculum = Function(
             "curriculum", [String(self.curriculum_id), String(self.group)]

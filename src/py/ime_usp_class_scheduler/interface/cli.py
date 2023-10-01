@@ -12,7 +12,7 @@ from ime_usp_class_scheduler.constants import (
 )
 from ime_usp_class_scheduler.interface.configuration import Configuration
 from ime_usp_class_scheduler.model.data import (
-    ASPData,
+    IntoASP,
     TeacherData,
     WorkloadData,
     generate_full_availability,
@@ -61,7 +61,7 @@ class CliInterface:
     @property
     def asp_inputs(self) -> str:
         """Return the ASP code representation of the raw input data."""
-        return "\n".join((raw_input.to_asp() for raw_input in self.raw_inputs))
+        return "\n".join((raw_input.into_asp() for raw_input in self.raw_inputs))
 
     def save_model(self, output_path: Path) -> None:
         """Write compiled ASP model (inputs and constraints) to a file."""
@@ -86,7 +86,7 @@ class CliInterface:
                         print(f"Failure because of {handler.core()}")
                     break
 
-    def _load_inputs(self) -> list[ASPData]:
+    def _load_inputs(self) -> list[IntoASP]:
         """
         Import data from INPUT_DIR using the appropriate parsers.
 
@@ -94,7 +94,7 @@ class CliInterface:
         data loaded from the parsers, for example, it adds full availability
         for teachers with no available teaching periods.
         """
-        input_data: list[ASPData] = []
+        input_data: list[IntoASP] = []
 
         def input_fpath(fname: str) -> Path:
             return INPUT_DIR.joinpath(fname)
