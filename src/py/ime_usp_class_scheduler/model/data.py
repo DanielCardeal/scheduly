@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any, Protocol
+from enum import Enum
 
 from attrs import field, frozen, validators
 from clingo.symbol import Function, Number, String, Symbol
@@ -12,6 +13,49 @@ class ASPData(Protocol):
     def to_asp(self) -> str:
         """Convert instance of the object to its ASP code representation."""
         ...
+
+
+class Weekday(Enum):
+    """Days of the week as they are represented inside scheduler."""
+
+    MONDAY = 0
+    TUESDAY = 1
+    WEDNESDAY = 2
+    THURSDAY = 3
+    FRIDAY = 4
+
+    def __str__(self) -> str:
+        match self:
+            case Weekday.MONDAY:
+                return "monday"
+            case Weekday.TUESDAY:
+                return "tuesday"
+            case Weekday.WEDNESDAY:
+                return "wednesday"
+            case Weekday.THURSDAY:
+                return "thursday"
+            case Weekday.FRIDAY:
+                return "friday"
+
+
+class Period(Enum):
+    """Class periods as they are represented inside the scheduler."""
+
+    MORNING_1 = 0
+    MORNING_2 = 1
+    AFTERNOON_1 = 2
+    AFTERNOON_2 = 3
+
+    def __str__(self) -> str:
+        match self:
+            case Period.MORNING_1:
+                return "8:00 - 9:40"
+            case Period.MORNING_2:
+                return "10:00 - 11:40"
+            case Period.AFTERNOON_1:
+                return "14:00 - 15:40"
+            case Period.AFTERNOON_2:
+                return "16:00 - 17:40"
 
 
 @frozen
@@ -54,14 +98,22 @@ class TeacherData:
         available = [
             Function(
                 "available",
-                [String(self.teacher_id), Number(t.weekday), Number(t.period)],
+                [
+                    String(self.teacher_id),
+                    Number(t.weekday.value),
+                    Number(t.period.value),
+                ],
             )
             for t in self.available_time
         ]
         preferred = [
             Function(
                 "preferred",
-                [String(self.teacher_id), Number(t.weekday), Number(t.period)],
+                [
+                    String(self.teacher_id),
+                    Number(t.weekday.value),
+                    Number(t.period.value),
+                ],
             )
             for t in self.preferred_time
         ]
@@ -72,13 +124,8 @@ class TeacherData:
 class ScheduleTimeslot:
     """Represents a timeslot on the schedule."""
 
-    weekday: int = field(validator=validators.instance_of(int))
-    period: int = field(validator=validators.instance_of(int))
-
-    @weekday.validator
-    def _validate_weekday(self, _: Any, value: int) -> None:
-        if not 1 <= value <= 7:
-            raise ValueError("weekday must be between 1 and 7")
+    weekday: Weekday = field(validator=validators.instance_of(Weekday))
+    period: Period = field(validator=validators.instance_of(Period))
 
 
 @frozen
@@ -114,8 +161,8 @@ class WorkloadData:
                 [
                     String(self.course_id),
                     String(self.offering_group),
-                    Number(t.weekday),
-                    Number(t.period),
+                    Number(t.weekday.value),
+                    Number(t.period.value),
                 ],
             )
             for t in self.fixed_classes
@@ -178,7 +225,9 @@ class CurriculaCoursesData:
 
 def generate_full_availability() -> set[ScheduleTimeslot]:
     """Generate a set with all the possible timeslots."""
-    return set(ScheduleTimeslot(w, p) for w in range(1, 6) for p in range(1, 5))
+    return set(ScheduleTimeslot(w, p) for w in Weekday for p in Period)
+
+
 
 
 def _asp_list_to_str(asp_list: list[Symbol]) -> str:

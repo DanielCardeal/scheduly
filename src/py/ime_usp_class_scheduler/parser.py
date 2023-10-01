@@ -10,8 +10,10 @@ from ime_usp_class_scheduler.model.data import (
     CurriculaCoursesData,
     CurriculaData,
     JointClassData,
+    Period,
     ScheduleTimeslot,
     TeacherData,
+    Weekday,
     WorkloadData,
     generate_full_availability,
 )
@@ -21,51 +23,55 @@ class ParserException(Exception):
     """Exception raised when an error occurs during the parsing of CSV input files."""
 
 
-def _get_timeslots(weekday: int, input: str) -> set[ScheduleTimeslot]:
+def _get_timeslots(weekday: Weekday, input: str) -> set[ScheduleTimeslot]:
     """Extract timeslots for a given weekday using the time information stored
     in the input string
 
     Example:
 
-    >>> sorted(_get_timeslots(2, "8:00-10:00;14:00-16:00"))
-    [ScheduleTimeslot(weekday=2, period=1), ScheduleTimeslot(weekday=2, period=3)]
+    >>> timeslots = _get_timeslots(Weekday.WEDNESDAY, "8:00-10:00;14:00-16:00")
+    >>> ScheduleTimeslot(weekday=Weekday.WEDNESDAY, period=Period.MORNING_1) in timeslots
+    True
+    >>> ScheduleTimeslot(weekday=Weekday.WEDNESDAY, period=Period.AFTERNOON_1) in timeslots
+    True
     """
     if not input:
         return set()
 
-    preferred_time = set()
+    preferred_time: set[ScheduleTimeslot] = set()
     for time_range in input.split(";"):
         start_time = time_range.split("-")[0]
         time = dt.datetime.strptime(start_time, "%H:%M").time()
         period = _time_to_period(time)
-        preferred_time.add(ScheduleTimeslot(weekday, period))
+        if period:
+            preferred_time.add(ScheduleTimeslot(weekday, period))
 
     return preferred_time
 
 
-def _time_to_period(time: dt.time) -> int:
+def _time_to_period(time: dt.time) -> Period | None:
     """
     Return the time period that intersects a given time_input. If the time
     period doesn't match any time periods, returns -1.
 
     >>> _time_to_period(dt.time(7, 40))
-    -1
-    >>> _time_to_period(dt.time(8, 34))
-    1
-    >>> _time_to_period(dt.time(10, 00))
-    2
-    >>> _time_to_period(dt.time(15, 10))
-    3
+
+    >>> _time_to_period(dt.time(8, 34)) == Period.MORNING_1
+    True
+    >>> _time_to_period(dt.time(10, 00)) == Period.MORNING_2
+    True
+    >>> _time_to_period(dt.time(15, 10)) == Period.AFTERNOON_1
+    True
     """
     if dt.time(8, 0) <= time <= dt.time(9, 40):
-        return 1
+        return Period.MORNING_1
     elif dt.time(10, 0) <= time <= dt.time(11, 40):
-        return 2
+        return Period.MORNING_2
     elif dt.time(14, 0) <= time <= dt.time(15, 40):
-        return 3
+        return Period.AFTERNOON_1
     elif dt.time(16, 0) <= time <= dt.time(17, 40):
-        return 4
-    return -1
+        return Period.AFTERNOON_2
+    return None
 
 
 def _get_teacher_id(teacher_email: str) -> str:
@@ -104,16 +110,16 @@ def _get_fixed_classes(fixed_classes_input: str) -> set[ScheduleTimeslot]:
     """
     # Captures the triplet [weekday, class start time, class end time (if present)]
     FIXED_CLASS_REGEX = r"([2-6])a ([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?"
-    fixed_classes = set()
+    fixed_classes: set[ScheduleTimeslot] = set()
     for weekday, start_time, end_time in re.findall(
         FIXED_CLASS_REGEX, fixed_classes_input
     ):
-        weekday = int(weekday) - 1  # weekdays on the scheduler are repr. [1-5]
-        periods = set()
+        weekday = Weekday(int(weekday) - 2)
+        periods: set[Period] = set()
 
         start_time = dt.datetime.strptime(start_time, "%H:%M")
         start_period = _time_to_period(start_time.time())
-        if start_period != -1:
+        if start_period is not None:
             periods.add(start_period)
 
         if end_time:
@@ -123,7 +129,7 @@ def _get_fixed_classes(fixed_classes_input: str) -> set[ScheduleTimeslot]:
             end_time = start_time + dt.timedelta(hours=1, minutes=40)
 
         end_period = _time_to_period(end_time.time())
-        if end_period != -1:
+        if end_period is not None:
             periods.add(end_period)
 
         for period in periods:
@@ -290,12 +296,11 @@ def ime_parse_schedule(schedule_file: io.TextIOWrapper) -> list[TeacherData]:
         teacher_id = _get_teacher_id(row[1])
 
         preferred_time: set[ScheduleTimeslot] = set()
-        for i in range(2, 7):
-            preferred_time = preferred_time.union(_get_timeslots(i - 1, row[i]))
-
         available_time = generate_full_availability()
-        for i in range(7, 12):
-            available_time -= _get_timeslots(i - 6, row[i])
+        for day in Weekday:
+            i = day.value
+            preferred_time = preferred_time.union(_get_timeslots(day, row[i + 2]))
+            available_time -= _get_timeslots(day, row[i + 2 + len(Weekday)])
 
         teachers.append(TeacherData(teacher_id, available_time, preferred_time))
     return teachers

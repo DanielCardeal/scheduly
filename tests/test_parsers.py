@@ -3,8 +3,10 @@ from ime_usp_class_scheduler.model.data import (
     CurriculaCoursesData,
     CurriculaData,
     JointClassData,
+    Period,
     ScheduleTimeslot,
     TeacherData,
+    Weekday,
     WorkloadData,
     generate_full_availability,
 )
@@ -24,27 +26,37 @@ def test_parse_workload() -> None:
             "mac0329",
             "nina",
             "BCC",
-            {ScheduleTimeslot(2, 1), ScheduleTimeslot(4, 2)},
+            {
+                ScheduleTimeslot(Weekday(1), Period(0)),
+                ScheduleTimeslot(Weekday(3), Period(1)),
+            },
         ),
         WorkloadData("mac0499", "nina", "BCC", set()),
-        WorkloadData("mac0101", "leliane", "BCC", {ScheduleTimeslot(2, 3)}),
+        WorkloadData(
+            "mac0101", "leliane", "BCC", {ScheduleTimeslot(Weekday(1), Period(2))}
+        ),
         WorkloadData(
             "mac0321",
             "ddm",
             "Poli EC - PCS 2",
-            {ScheduleTimeslot(5, 1), ScheduleTimeslot(5, 2)},
+            {
+                ScheduleTimeslot(Weekday(4), Period(0)),
+                ScheduleTimeslot(Weekday(4), Period(1)),
+            },
         ),
         WorkloadData(
             "mac0113",
             "pmiranda",
             "FEA 1",
             {
-                ScheduleTimeslot(3, 1),
-                ScheduleTimeslot(5, 1),
-                ScheduleTimeslot(5, 2),
+                ScheduleTimeslot(Weekday(2), Period(0)),
+                ScheduleTimeslot(Weekday(4), Period(0)),
+                ScheduleTimeslot(Weekday(4), Period(1)),
             },
         ),
-        WorkloadData("mac2166", "fujita", "Poli Web C", {ScheduleTimeslot(5, 4)}),
+        WorkloadData(
+            "mac2166", "fujita", "Poli Web C", {ScheduleTimeslot(Weekday(4), Period(3))}
+        ),
         WorkloadData("mac0113", "hirata", "FEA 1", set()),
         WorkloadData("mac0320", "yoshiko", "BCC", set()),
         WorkloadData("mac5770", "yoshiko", "BCC_POS", set()),
@@ -62,25 +74,25 @@ def test_parse_schedule() -> None:
             generate_full_availability()
             - {
                 # Monday
-                ScheduleTimeslot(1, 1),
-                ScheduleTimeslot(1, 2),
+                ScheduleTimeslot(Weekday(0), Period(0)),
+                ScheduleTimeslot(Weekday(0), Period(1)),
                 # Thursday
-                ScheduleTimeslot(4, 3),
+                ScheduleTimeslot(Weekday(3), Period(2)),
             },
             preferred_time={
                 # Wednesday
-                ScheduleTimeslot(3, 1),
-                ScheduleTimeslot(3, 2),
-                ScheduleTimeslot(3, 3),
-                ScheduleTimeslot(3, 4),
+                ScheduleTimeslot(Weekday(2), Period(0)),
+                ScheduleTimeslot(Weekday(2), Period(1)),
+                ScheduleTimeslot(Weekday(2), Period(2)),
+                ScheduleTimeslot(Weekday(2), Period(3)),
                 # Thursday
-                ScheduleTimeslot(4, 1),
-                ScheduleTimeslot(4, 2),
+                ScheduleTimeslot(Weekday(3), Period(0)),
+                ScheduleTimeslot(Weekday(3), Period(1)),
                 # Friday
-                ScheduleTimeslot(5, 1),
-                ScheduleTimeslot(5, 2),
-                ScheduleTimeslot(5, 3),
-                ScheduleTimeslot(5, 4),
+                ScheduleTimeslot(Weekday(4), Period(0)),
+                ScheduleTimeslot(Weekday(4), Period(1)),
+                ScheduleTimeslot(Weekday(4), Period(2)),
+                ScheduleTimeslot(Weekday(4), Period(3)),
             },
         ),
         TeacherData(
@@ -88,30 +100,30 @@ def test_parse_schedule() -> None:
             generate_full_availability()
             - {
                 # Monday
-                ScheduleTimeslot(1, 3),
-                ScheduleTimeslot(1, 4),
+                ScheduleTimeslot(Weekday(0), Period(2)),
+                ScheduleTimeslot(Weekday(0), Period(3)),
                 # Tuesday
-                ScheduleTimeslot(2, 3),
-                ScheduleTimeslot(2, 4),
+                ScheduleTimeslot(Weekday(1), Period(2)),
+                ScheduleTimeslot(Weekday(1), Period(3)),
                 # Wednesday
-                ScheduleTimeslot(3, 3),
-                ScheduleTimeslot(3, 4),
+                ScheduleTimeslot(Weekday(2), Period(2)),
+                ScheduleTimeslot(Weekday(2), Period(3)),
                 # Thursday
-                ScheduleTimeslot(4, 3),
-                ScheduleTimeslot(4, 4),
+                ScheduleTimeslot(Weekday(3), Period(2)),
+                ScheduleTimeslot(Weekday(3), Period(3)),
                 # Friday
-                ScheduleTimeslot(5, 1),
-                ScheduleTimeslot(5, 2),
-                ScheduleTimeslot(5, 3),
-                ScheduleTimeslot(5, 4),
+                ScheduleTimeslot(Weekday(4), Period(0)),
+                ScheduleTimeslot(Weekday(4), Period(1)),
+                ScheduleTimeslot(Weekday(4), Period(2)),
+                ScheduleTimeslot(Weekday(4), Period(3)),
             },
             preferred_time={
                 # Tuesday
-                ScheduleTimeslot(2, 1),
-                ScheduleTimeslot(2, 2),
+                ScheduleTimeslot(Weekday(1), Period(0)),
+                ScheduleTimeslot(Weekday(1), Period(1)),
                 # Thursday
-                ScheduleTimeslot(4, 1),
-                ScheduleTimeslot(4, 2),
+                ScheduleTimeslot(Weekday(3), Period(0)),
+                ScheduleTimeslot(Weekday(3), Period(1)),
             },
         ),
         TeacherData(
@@ -119,36 +131,36 @@ def test_parse_schedule() -> None:
             generate_full_availability()
             - {
                 # Monday
-                ScheduleTimeslot(1, 1),
+                ScheduleTimeslot(Weekday(0), Period(0)),
                 # Tuesday
-                ScheduleTimeslot(2, 1),
+                ScheduleTimeslot(Weekday(1), Period(0)),
                 # Wednesday
-                ScheduleTimeslot(3, 1),
+                ScheduleTimeslot(Weekday(2), Period(0)),
                 # Thursday
-                ScheduleTimeslot(4, 1),
+                ScheduleTimeslot(Weekday(3), Period(0)),
                 # Friday
-                ScheduleTimeslot(5, 1),
-                ScheduleTimeslot(5, 2),
-                ScheduleTimeslot(5, 3),
-                ScheduleTimeslot(5, 4),
+                ScheduleTimeslot(Weekday(4), Period(0)),
+                ScheduleTimeslot(Weekday(4), Period(1)),
+                ScheduleTimeslot(Weekday(4), Period(2)),
+                ScheduleTimeslot(Weekday(4), Period(3)),
             },
             preferred_time={
                 # Monday
-                ScheduleTimeslot(1, 2),
-                ScheduleTimeslot(1, 3),
-                ScheduleTimeslot(1, 4),
+                ScheduleTimeslot(Weekday(0), Period(1)),
+                ScheduleTimeslot(Weekday(0), Period(2)),
+                ScheduleTimeslot(Weekday(0), Period(3)),
                 # Tuesday
-                ScheduleTimeslot(2, 2),
-                ScheduleTimeslot(2, 3),
-                ScheduleTimeslot(2, 4),
+                ScheduleTimeslot(Weekday(1), Period(1)),
+                ScheduleTimeslot(Weekday(1), Period(2)),
+                ScheduleTimeslot(Weekday(1), Period(3)),
                 # Wednesday
-                ScheduleTimeslot(3, 2),
-                ScheduleTimeslot(3, 3),
-                ScheduleTimeslot(3, 4),
+                ScheduleTimeslot(Weekday(2), Period(1)),
+                ScheduleTimeslot(Weekday(2), Period(2)),
+                ScheduleTimeslot(Weekday(2), Period(3)),
                 # Thursday
-                ScheduleTimeslot(4, 2),
-                ScheduleTimeslot(4, 3),
-                ScheduleTimeslot(4, 4),
+                ScheduleTimeslot(Weekday(3), Period(1)),
+                ScheduleTimeslot(Weekday(3), Period(2)),
+                ScheduleTimeslot(Weekday(3), Period(3)),
             },
         ),
     ]
