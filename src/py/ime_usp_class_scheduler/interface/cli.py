@@ -15,7 +15,7 @@ from ime_usp_class_scheduler.interface.configuration import (
     Configuration,
     ConfigurationException,
 )
-from ime_usp_class_scheduler.model.data import (
+from ime_usp_class_scheduler.model import (
     IntoASP,
     TeacherData,
     WorkloadData,

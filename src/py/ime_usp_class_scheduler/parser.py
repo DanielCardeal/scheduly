@@ -5,7 +5,7 @@ import re
 
 import pandas as pd
 
-from ime_usp_class_scheduler.model.data import (
+from ime_usp_class_scheduler.model import (
     CourseData,
     CurriculaCoursesData,
     CurriculaData,

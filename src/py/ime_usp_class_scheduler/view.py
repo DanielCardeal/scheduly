@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from clingo import Model, SymbolType
 from tabulate import tabulate
 
-from ime_usp_class_scheduler.model.data import (
+from ime_usp_class_scheduler.model import (
     ClassData,
     ConflictData,
     JointedData,
