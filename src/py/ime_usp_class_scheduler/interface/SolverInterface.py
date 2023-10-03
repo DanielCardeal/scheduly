@@ -39,6 +39,8 @@ class SolverInterface(ABC):
         for path in ("aliases", "base")
     ]
 
+    SOLVING_INTERVAL = 0.5
+
     def __init__(self, configuration: Configuration):
         self.configuration = configuration
 
@@ -89,12 +91,17 @@ class SolverInterface(ABC):
     def run(self) -> None:
         """Begin searching for solutions using the Clingo solver."""
         self.ctl.ground()
-        with self.ctl.solve(yield_=True) as handle:  # type: ignore[union-attr]
-            for model in handle:
+        with self.ctl.solve(yield_=True, async_=True) as handle:  # type: ignore[union-attr]
+            while True:
+                handle.resume()
+                _ = handle.wait(self.SOLVING_INTERVAL)
+                model = handle.model()
+                if model is None:
+                    result = handle.get()
+                    self.on_finish(result)
+                    break
                 self.last_models.append(model)
                 self.on_model(model)
-            result = handle.get()
-            self.on_finish(result)
 
     def save_model(self, output_path: Path) -> None:
         """Write compiled ASP model (inputs and constraints) to a file."""
