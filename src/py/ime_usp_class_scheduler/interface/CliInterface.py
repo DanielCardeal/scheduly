@@ -8,6 +8,10 @@ from ime_usp_class_scheduler.view import CliTabulateView, ModelView
 
 
 class CliInterface(SolverInterface):
+    """An implementation of the SolverInterface that is built for command-line
+    environments.
+    """
+
     _model_viewer: CliTabulateView
 
     def __init__(self, configuration: Configuration) -> None:

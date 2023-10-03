@@ -28,6 +28,12 @@ from ime_usp_class_scheduler.view import ModelView
 
 
 class SolverInterface(ABC):
+    """An interface for the underlying clingo solver.
+
+    The SolverInterface class is the sole responsible for running and
+    displaying results of a clingo solution search.
+    """
+
     MODEL_BASE_PATHS = [
         CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp")
         for path in ("aliases", "base")
