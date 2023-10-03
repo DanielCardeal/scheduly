@@ -6,26 +6,12 @@ import click
 
 from ime_usp_class_scheduler.interface.CliInterface import CliInterface
 from ime_usp_class_scheduler.interface.configuration import load_preset
+from ime_usp_class_scheduler.logging import error, info
 
 
 @click.group()
-@click.option(
-    "-l",
-    "--log-file",
-    type=click.Path(file_okay=True, dir_okay=False),
-    default="class_scheduler.log",
-    help="custom path to LOG file",
-)
-def main(log_file: Path) -> None:
-    logging.basicConfig(
-        filename=log_file,
-        filemode="w",
-        encoding="utf-8",
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s: %(message)s",
-        datefmt="%b %d %H:%m",
-    )
-    click.echo(f'Logging to "{log_file}"')
+def main() -> None:
+    pass
 
 
 @main.command()
