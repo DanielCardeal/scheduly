@@ -77,10 +77,10 @@ def load_preset(
             configuration_dict = tomli.load(f)
     except tomli.TOMLDecodeError as e:
         raise ConfigurationException(
-            f"TOML syntax error in prest file {preset_path}:\n{e}"
+            f"TOML syntax error in preset file {preset_path}:\n{e}"
         )
     except FileNotFoundError as e:
-        raise FileNotFoundError(f"Unable to find preset file {preset_path}.")
+        raise ConfigurationException(f"Unable to find preset file {preset_path}.")
 
     configuration = cattrs.structure(configuration_dict, Configuration)
 
