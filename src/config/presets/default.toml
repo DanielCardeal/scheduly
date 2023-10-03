@@ -12,5 +12,5 @@ hard = [
 ]
 
 soft = [
-    {name = 'avoid_all_conflicts', weight = 1 , priority = 0}
+    {name = 'avoid_all_conflicts', weight = 1 , priority = 0},
 ]

@@ -1,1 +1,5 @@
-:~ conflict(ClassA, GroupA, ClassB, GroupB). [w_avoid_all_conflicts@p_avoid_all_conflicts, ClassA, GroupA, ClassB, GroupB]
+%*
+Avoid all ocurrences of conflicts.
+*%
+:~ conflict(ClassA, GroupA, ClassB, GroupB).
+    [w_avoid_all_conflicts@p_avoid_all_conflicts, ClassA, GroupA, ClassB, GroupB]
