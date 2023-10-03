@@ -76,7 +76,6 @@ class CliTabulateView(TabulateView):
         """Displays the model as a pretty CLI table."""
         self._update_model(model)
         print(f'Optimization: {",".join([str(cost) for cost in model.cost])}')
-        print()
 
         header = ["Period", *[str(w) for w in Weekday]]
         body = []
@@ -87,3 +86,4 @@ class CliTabulateView(TabulateView):
             body.append(row)
 
         print(tabulate(body, headers=header, tablefmt="fancy_grid"))
+        print()
