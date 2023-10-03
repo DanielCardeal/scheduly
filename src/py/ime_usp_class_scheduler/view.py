@@ -32,9 +32,9 @@ class ModelView(ABC):
 
     def _update_model(self, model: Model) -> None:
         """Load new model information into the object."""
-        self.classes: set[ClassData] = set()
-        self.conflicts: set[ConflictData] = set()
-        self.jointed: set[JointedData] = set()
+        self.classes = set()
+        self.conflicts = set()
+        self.jointed = set()
 
         for symbol in model.symbols(shown=True):
             if symbol.type is not SymbolType.Function:
