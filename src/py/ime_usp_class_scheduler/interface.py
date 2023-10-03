@@ -1,16 +1,19 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod, abstractproperty
 from collections import deque
 from pathlib import Path
 
 from clingo import Control, Model, SolveResult
 
+from ime_usp_class_scheduler.configuration import Configuration
+from ime_usp_class_scheduler.console import console, log_info
 from ime_usp_class_scheduler.constants import (
     CONSTRAINTS_DIR,
     HARD_CONSTRAINTS_DIR,
     INPUT_DIR,
     SOFT_CONSTRAINTS_DIR,
 )
-from ime_usp_class_scheduler.interface.configuration import Configuration
 from ime_usp_class_scheduler.model import (
     IntoASP,
     TeacherData,
@@ -24,7 +27,7 @@ from ime_usp_class_scheduler.parser import (
     parse_curricula,
     parse_joint,
 )
-from ime_usp_class_scheduler.view import ModelView
+from ime_usp_class_scheduler.view import CliTabulateView, ModelView
 
 
 class SolverInterface(ABC):
@@ -195,3 +198,35 @@ class SolverInterface(ABC):
             model += weight + priority
 
         return model
+
+
+class CliInterface(SolverInterface):
+    """An implementation of the SolverInterface that is built for command-line
+    environments.
+    """
+
+    _model_viewer: CliTabulateView
+
+    def __init__(self, configuration: Configuration) -> None:
+        super().__init__(configuration)
+        self._model_viewer = CliTabulateView()
+
+    @property
+    def model_viewer(self) -> ModelView:
+        """Returns the model viewer for the given interface"""
+        return self._model_viewer
+
+    def on_model(self, model: Model) -> None:
+        """Callback for intercepting models generated from the ASP solver."""
+        log_info(f"Current optimization: {model.cost}")
+
+    def on_finish(self, result: SolveResult) -> None:
+        """Callback called once the search has concluded."""
+        console.rule("Best schedules found")
+        for model in self.last_models:
+            self.model_viewer.show_model(model)
+
+    def run(self) -> None:
+        """Begin searching for solutions using the Clingo solver."""
+        with console.status("[bold green]Searching for models..."):
+            super().run()

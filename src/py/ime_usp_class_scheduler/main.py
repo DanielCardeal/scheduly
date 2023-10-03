@@ -5,10 +5,10 @@ from typing import Optional
 import click
 from rich.prompt import Confirm, Prompt
 
+from ime_usp_class_scheduler.configuration import load_preset
 from ime_usp_class_scheduler.console import log_error, log_exception, log_info
 from ime_usp_class_scheduler.constants import HARD_CONSTRAINTS_DIR, SOFT_CONSTRAINTS_DIR
-from ime_usp_class_scheduler.interface.CliInterface import CliInterface
-from ime_usp_class_scheduler.interface.configuration import load_preset
+from ime_usp_class_scheduler.interface import CliInterface
 
 
 @click.group()
