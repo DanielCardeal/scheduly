@@ -4,17 +4,13 @@ from pathlib import Path
 
 from clingo import Control, Model, SolveResult
 
-from ime_usp_class_scheduler import view
 from ime_usp_class_scheduler.constants import (
     CONSTRAINTS_DIR,
     HARD_CONSTRAINTS_DIR,
     INPUT_DIR,
     SOFT_CONSTRAINTS_DIR,
 )
-from ime_usp_class_scheduler.interface.configuration import (
-    Configuration,
-    ConfigurationException,
-)
+from ime_usp_class_scheduler.interface.configuration import Configuration
 from ime_usp_class_scheduler.model import (
     IntoASP,
     TeacherData,
@@ -40,15 +36,6 @@ class SolverInterface(ABC):
     def __init__(self, configuration: Configuration):
         self.configuration = configuration
 
-        # Load model viewer
-        try:
-            viewer_cls = getattr(view, self.configuration.viewer)
-            self.viewer: ModelView = viewer_cls()
-        except AttributeError:
-            raise ConfigurationException(
-                f"Unable to load '{self.configuration.viewer}' viewer."
-            )
-
         # Set clingo options
         self.ctl = Control()
         self.ctl.configuration.solve.opt_mode = "optN"  # type: ignore[union-attr]
@@ -72,6 +59,11 @@ class SolverInterface(ABC):
 
         self.program = program
         self.ctl.add(self.program)
+
+    @abstractproperty
+    def model_viewer(self) -> ModelView:
+        """Returns the model viewer for the given interface"""
+        ...
 
     @property
     def asp_inputs(self) -> str:

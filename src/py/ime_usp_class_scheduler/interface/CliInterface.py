@@ -4,12 +4,20 @@ from clingo import Model, SolveResult
 
 from ime_usp_class_scheduler.interface.configuration import Configuration
 from ime_usp_class_scheduler.interface.SolverInterface import SolverInterface
+from ime_usp_class_scheduler.view import CliTabulateView, ModelView
 
 
 class CliInterface(SolverInterface):
+    _model_viewer: CliTabulateView
 
     def __init__(self, configuration: Configuration) -> None:
         super().__init__(configuration)
+        self._model_viewer = CliTabulateView()
+
+    @property
+    def model_viewer(self) -> ModelView:
+        """Returns the model viewer for the given interface"""
+        return self._model_viewer
 
     def on_model(self, model: Model) -> None:
         """Callback for intercepting models generated from the ASP solver."""
@@ -19,4 +27,4 @@ class CliInterface(SolverInterface):
         """Callback called once the search has concluded."""
         print("Best schedules found:")
         for model in self.last_models:
-            self.viewer.show_model(model)
+            self.model_viewer.show_model(model)

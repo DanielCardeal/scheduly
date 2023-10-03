@@ -19,7 +19,6 @@ class ConfigurationException(Exception):
 class Configuration:
     """Represents the user configuration of the scheduler program"""
 
-    viewer: str
     clingo: ClingoOptions
     constraints: ConstraintsConfiguration
 
@@ -71,7 +70,6 @@ def load_preset(
     num_models: Optional[int] = None,
     time_limit: Optional[int] = None,
     threads: Optional[int] = None,
-    viewer: Optional[str] = None,
 ) -> Configuration:
     preset_path = PRESETS_DIR.joinpath(preset).with_suffix(".toml")
     try:
