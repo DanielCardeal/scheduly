@@ -12,5 +12,6 @@ hard = [
 ]
 
 soft = [
+    {name = 'teacher_preferences', weight = 1, priority = 1},
     {name = 'avoid_all_conflicts', weight = 1 , priority = 0},
 ]
