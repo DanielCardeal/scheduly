@@ -3,8 +3,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from clingo import Model, SymbolType
-from tabulate import tabulate
+from rich.table import Table
 
+from ime_usp_class_scheduler.console import console
 from ime_usp_class_scheduler.model import (
     ClassData,
     ConflictData,
@@ -75,15 +76,16 @@ class CliTabulateView(TabulateView):
     def show_model(self, model: Model) -> None:
         """Displays the model as a pretty CLI table."""
         self._update_model(model)
-        print(f'Optimization: {",".join([str(cost) for cost in model.cost])}')
 
-        header = ["Period", *[str(w) for w in Weekday]]
-        body = []
+        headers = ["Period", *[str(w) for w in Weekday]]
+        table = Table(
+            *headers,
+            title=f"Optimization: {model.cost}",
+        )
         for p in Period:
             row = [str(p)]
             for w in Weekday:
                 row.append("\n".join(self.schedule[w][p]))
-            body.append(row)
+            table.add_row(*row)
 
-        print(tabulate(body, headers=header, tablefmt="fancy_grid"))
-        print()
+        console.print(table)

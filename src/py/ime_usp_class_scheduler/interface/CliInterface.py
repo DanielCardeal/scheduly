@@ -30,7 +30,7 @@ class CliInterface(SolverInterface):
 
     def on_finish(self, result: SolveResult) -> None:
         """Callback called once the search has concluded."""
-        print("Best schedules found:")
+        console.rule("Best schedules found")
         for model in self.last_models:
             self.model_viewer.show_model(model)
 
