@@ -4,7 +4,7 @@ from typing import Optional
 
 import click
 
-from ime_usp_class_scheduler.interface.cli import CliInterface
+from ime_usp_class_scheduler.interface.CliInterface import CliInterface
 from ime_usp_class_scheduler.interface.configuration import load_preset
 
 

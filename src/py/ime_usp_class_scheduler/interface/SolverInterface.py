@@ -1,8 +1,8 @@
-from __future__ import annotations
-
+from abc import ABC, abstractmethod, abstractproperty
+from collections import deque
 from pathlib import Path
 
-from clingo import Control
+from clingo import Control, Model, SolveResult
 
 from ime_usp_class_scheduler import view
 from ime_usp_class_scheduler.constants import (
@@ -30,12 +30,13 @@ from ime_usp_class_scheduler.parser import (
 )
 from ime_usp_class_scheduler.view import ModelView
 
-MODEL_BASE_PATHS = [
-    CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp") for path in ("aliases", "base")
-]
 
+class SolverInterface(ABC):
+    MODEL_BASE_PATHS = [
+        CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp")
+        for path in ("aliases", "base")
+    ]
 
-class CliInterface:
     def __init__(self, configuration: Configuration):
         self.configuration = configuration
 
@@ -53,6 +54,8 @@ class CliInterface:
         self.ctl.configuration.solve.opt_mode = "optN"  # type: ignore[union-attr]
         self.ctl.configuration.solve.models = configuration.clingo.num_models  # type: ignore[union-attr]
         self.ctl.configuration.solve.parallel_mode = configuration.clingo.threads  # type: ignore[union-attr]
+
+        self.last_models: deque[Model] = deque(maxlen=configuration.clingo.num_models)
 
         # Build ASP program
         def header(header: str) -> str:
@@ -75,15 +78,30 @@ class CliInterface:
         """Return the ASP code representation of the raw input data."""
         return "\n".join((raw_input.into_asp() for raw_input in self.raw_inputs))
 
+    @abstractmethod
+    def on_model(self, model: Model) -> None | bool:
+        """Callback for intercepting models generated from the ASP solver."""
+        ...
+
+    @abstractmethod
+    def on_finish(self, result: SolveResult) -> None:
+        """Callback called once the search has concluded."""
+        ...
+
+    def run(self) -> None:
+        """Begin searching for solutions using the Clingo solver."""
+        self.ctl.ground()
+        with self.ctl.solve(yield_=True) as handle:  # type: ignore[union-attr]
+            for model in handle:
+                self.last_models.append(model)
+                self.on_model(model)
+            result = handle.get()
+            self.on_finish(result)
+
     def save_model(self, output_path: Path) -> None:
         """Write compiled ASP model (inputs and constraints) to a file."""
         with open(output_path, "w") as f:
             f.write(self.program)
-
-    def run(self) -> None:
-        """Search for solutions using Clingo."""
-        self.ctl.ground()
-        _ = self.ctl.solve(on_model=self.viewer.show_model)
 
     def _load_inputs(self) -> list[IntoASP]:
         """
@@ -148,7 +166,7 @@ class CliInterface:
         model = ""
 
         # Load constraints
-        paths: list[Path] = MODEL_BASE_PATHS.copy()
+        paths = self.MODEL_BASE_PATHS.copy()
         paths += [
             HARD_CONSTRAINTS_DIR.joinpath(constraint_cfg.path)
             for constraint_cfg in self.configuration.constraints.hard
