@@ -5,10 +5,10 @@ from typing import Optional
 import click
 from rich.prompt import Confirm, Prompt
 
+from ime_usp_class_scheduler.console import log_error, log_exception, log_info
 from ime_usp_class_scheduler.constants import HARD_CONSTRAINTS_DIR, SOFT_CONSTRAINTS_DIR
 from ime_usp_class_scheduler.interface.CliInterface import CliInterface
 from ime_usp_class_scheduler.interface.configuration import load_preset
-from ime_usp_class_scheduler.logging import error, info
 
 
 @click.group()
@@ -50,10 +50,14 @@ def cli(
     threads: Optional[int],
     model_out_path: Optional[Path],
 ) -> None:
-    configuration = load_preset(
-        preset, num_models=num_models, time_limit=time_limit, threads=threads
-    )
-    interface = CliInterface(configuration)
+    try:
+        configuration = load_preset(
+            preset, num_models=num_models, time_limit=time_limit, threads=threads
+        )
+        interface = CliInterface(configuration)
+    except Exception:
+        log_exception()
+        exit(1)
 
     if model_out_path is not None:
         interface.save_model(model_out_path)
@@ -71,7 +75,7 @@ def new(constraint_type: str):
 
     name = Prompt.ask("Enter the constraint name")
     if not name:
-        error("The constraint name cannot be empty.")
+        log_error("The constraint name cannot be empty.")
         exit(1)
     name = "_".join([word.lower() for word in name.split()])
 
@@ -108,11 +112,11 @@ def new(constraint_type: str):
     ):
         with open(path, "w") as f:
             f.write(contents)
-        info(f"Created {path} with the following contents:")
+        log_info(f"Created {path} with the following contents:")
         # NOTE: Don't use rich because of soft constraint brackets
         print(contents)
     else:
-        print()
+        log_info("Operation cancelled.")
 
 
 if __name__ == "__main__":
