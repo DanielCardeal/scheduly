@@ -67,7 +67,7 @@ def cli(
 
 @main.command()
 @click.argument("constraint-type", type=click.Choice(["hard", "soft"]), nargs=1)
-def new(constraint_type: str):
+def new(constraint_type: str) -> None:
     assert constraint_type in (
         "hard",
         "soft",
