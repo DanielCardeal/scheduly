@@ -86,8 +86,11 @@ This page lists and explains all of the predicates and values used within the pr
 
 + `conflict/6(first course id, first course group, second course group, second course group, weekday, period)`
 
-  Register schedule conflicts between two different courses or two different offerings of the same course. Conflicts occur when two classes occur in the same period and weekday.
-  
+  Register schedule conflicts between two different courses or two different
+  offerings of the same course. Conflicts occur when two classes occur in the
+  same period and weekday. Note that `jointed` classes don't count as
+  conflicting by the scheduler.
+
 ### Aliases
 
 This predicates don't add information about the model, but they facilitate
