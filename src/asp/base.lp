@@ -55,8 +55,7 @@ conflict(Course1, Group1, Course2, Group2, Weekday, Period) :-
     class(Course1, Group1, Weekday, Period),
     class(Course2, Group2, Weekday, Period),
     not joint(Course1, Course2),
-    Course1 != Course2,
-    Course1 > Course2.
+    Course1 != Course2.
 
 % Group conflict
 conflict(Course1, Group1, Course2, Group2, Weekday, Period) :-
@@ -64,7 +63,7 @@ conflict(Course1, Group1, Course2, Group2, Weekday, Period) :-
     class(Course2, Group2, Weekday, Period),
     not joint(Course1, Course2),
     Course1 == Course2,
-    Group1 > Group2.
+    Group1 != Group2.
 
 
 %*
