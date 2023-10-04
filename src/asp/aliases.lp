@@ -1,4 +1,9 @@
 %*
+def period/1(period id)
+*%
+period(P) :- period(P, _).
+
+%*
 def num_classes/2(course id, number of weekly classes)
 *%
 num_classes(Course, NumClasses) :- course(Course, _, NumClasses, _, _).

@@ -96,6 +96,7 @@ This page lists and explains all of the predicates and values used within the pr
 This predicates don't add information about the model, but they facilitate
 writing rules in a more concise manner. 
 
++ `period/1(period id)`
 + `num_classes/2(course id, number of weekly classes)`
 + `is_double/1(course id)`
 + `is_undergrad/1(course id)`
