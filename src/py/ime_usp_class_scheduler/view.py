@@ -50,8 +50,8 @@ class ModelView(ABC):
                     pass
 
 
-class TabulateView(ModelView):
-    """Base class for model viewers using the `tabulate` package."""
+class CliTabularView(ModelView):
+    """Model viewer that displays models as pretty CLI tables."""
 
     def __init__(self) -> None:
         super().__init__()
