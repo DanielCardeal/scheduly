@@ -9,6 +9,11 @@ def num_classes/2(course id, number of weekly classes)
 num_classes(Course, NumClasses) :- course(Course, _, NumClasses, _, _).
 
 %*
+def ideal_period/2(course id, ideal period)
+*%
+ideal_period(Course, IdealPeriod) :- course(Course, _, _, IdealPeriod, _).
+
+%*
 def is_double/1(course_id)
 *%
 is_double(Course) :- course(Course, _, _, _, 1).
