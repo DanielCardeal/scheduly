@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 from collections import deque
 from pathlib import Path
 
@@ -16,6 +16,7 @@ from ime_usp_class_scheduler.constants import (
 )
 from ime_usp_class_scheduler.model import (
     IntoASP,
+    ModelResult,
     TeacherData,
     WorkloadData,
     generate_full_availability,
@@ -27,7 +28,7 @@ from ime_usp_class_scheduler.parser import (
     parse_curricula,
     parse_joint,
 )
-from ime_usp_class_scheduler.view import CliTabulateView, ModelView
+from ime_usp_class_scheduler.view import CliTabularView, ModelView
 
 
 class SolverInterface(ABC):
@@ -37,23 +38,26 @@ class SolverInterface(ABC):
     displaying results of a clingo solution search.
     """
 
-    MODEL_BASE_PATHS = [
+    _MODEL_BASE_PATHS = [
         CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp")
         for path in ("aliases", "base")
     ]
 
-    SOLVING_INTERVAL = 0.5
+    _model_viewer: ModelView
 
     def __init__(self, configuration: Configuration):
         self.configuration = configuration
 
         # Set clingo options
-        self.ctl = Control()
-        self.ctl.configuration.solve.opt_mode = "optN"  # type: ignore[union-attr]
-        self.ctl.configuration.solve.models = configuration.clingo.num_models  # type: ignore[union-attr]
-        self.ctl.configuration.solve.parallel_mode = configuration.clingo.threads  # type: ignore[union-attr]
+        self._control = Control()
+        self._control.configuration.solve.opt_mode = "optN"  # type: ignore[union-attr]
+        self._control.configuration.solve.models = configuration.clingo.num_models  # type: ignore[union-attr]
+        self._control.configuration.solve.parallel_mode = configuration.clingo.threads  # type: ignore[union-attr]
 
-        self.last_models: deque[Model] = deque(maxlen=configuration.clingo.num_models)
+        self.time_limit = configuration.clingo.time_limit
+        self._best_models: deque[ModelResult] = deque(
+            maxlen=configuration.clingo.num_models
+        )
 
         # Build ASP program
         def header(header: str) -> str:
@@ -69,12 +73,7 @@ class SolverInterface(ABC):
         program += self._load_model()
 
         self.program = program
-        self.ctl.add(self.program)
-
-    @abstractproperty
-    def model_viewer(self) -> ModelView:
-        """Returns the model viewer for the given interface"""
-        ...
+        self._control.add(self.program)
 
     @property
     def asp_inputs(self) -> str:
@@ -82,29 +81,25 @@ class SolverInterface(ABC):
         return "\n".join((raw_input.into_asp() for raw_input in self.raw_inputs))
 
     @abstractmethod
-    def on_model(self, model: Model) -> None | bool:
+    def _on_model(self, model: Model) -> None:
         """Callback for intercepting models generated from the ASP solver."""
-        ...
+        self._best_models.append(ModelResult(model.symbols(shown=True), model.cost))
 
     @abstractmethod
-    def on_finish(self, result: SolveResult) -> None:
+    def _on_finish(self, result: SolveResult) -> None:
         """Callback called once the search has concluded."""
         ...
 
     def run(self) -> None:
         """Begin searching for solutions using the Clingo solver."""
-        self.ctl.ground()
-        with self.ctl.solve(yield_=True, async_=True) as handle:  # type: ignore[union-attr]
-            while True:
-                handle.resume()
-                _ = handle.wait(self.SOLVING_INTERVAL)
-                model = handle.model()
-                if model is None:
-                    result = handle.get()
-                    self.on_finish(result)
-                    break
-                self.last_models.append(model)
-                self.on_model(model)
+        self._control.ground()
+        with self._control.solve(on_model=self._on_model, async_=True) as handle:  # type: ignore[union-attr]
+            handle.wait(self.time_limit)
+            # log_info(f"Reached the time limit of {self.time_limit} seconds.")
+            # log_info("Stopping the solver...")
+            handle.cancel()
+            result = handle.get()
+            self._on_finish(result)
 
     def save_model(self, output_path: Path) -> None:
         """Write compiled ASP model (inputs and constraints) to a file."""
@@ -174,7 +169,7 @@ class SolverInterface(ABC):
         model = ""
 
         # Load constraints
-        paths = self.MODEL_BASE_PATHS.copy()
+        paths = self._MODEL_BASE_PATHS.copy()
         paths += [
             HARD_CONSTRAINTS_DIR.joinpath(constraint_cfg.path)
             for constraint_cfg in self.configuration.constraints.hard
@@ -205,26 +200,22 @@ class CliInterface(SolverInterface):
     environments.
     """
 
-    _model_viewer: CliTabulateView
-
     def __init__(self, configuration: Configuration) -> None:
         super().__init__(configuration)
-        self._model_viewer = CliTabulateView()
+        self._model_viewer = CliTabularView()
 
-    @property
-    def model_viewer(self) -> ModelView:
-        """Returns the model viewer for the given interface"""
-        return self._model_viewer
-
-    def on_model(self, model: Model) -> None:
+    def _on_model(self, model: Model) -> None:
         """Callback for intercepting models generated from the ASP solver."""
+        super()._on_model(model)
         log_info(f"Current optimization: {model.cost}")
 
-    def on_finish(self, result: SolveResult) -> None:
+    def _on_finish(self, result: SolveResult) -> None:
         """Callback called once the search has concluded."""
-        console.rule("Best schedules found")
-        for model in self.last_models:
-            self.model_viewer.show_model(model)
+        console.rule("solving results")
+        log_info(f"Solving status: {result}")
+        log_info(f"Showing top {len(self._best_models)} results:")
+        for model in self._best_models:
+            self._model_viewer.show_model(model)
 
     def run(self) -> None:
         """Begin searching for solutions using the Clingo solver."""

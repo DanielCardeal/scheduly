@@ -10,6 +10,7 @@ from ime_usp_class_scheduler.model import (
     ClassData,
     ConflictData,
     JointedData,
+    ModelResult,
     Period,
     Weekday,
 )
@@ -26,17 +27,17 @@ class ModelView(ABC):
         super().__init__()
 
     @abstractmethod
-    def show_model(self, model: Model) -> None:
+    def show_model(self, model: ModelResult) -> None:
         """Displays a model."""
         ...
 
-    def _update_model(self, model: Model) -> None:
+    def _update_model(self, model: ModelResult) -> None:
         """Load new model information into the object."""
         self.classes = set()
         self.conflicts = set()
         self.jointed = set()
 
-        for symbol in model.symbols(shown=True):
+        for symbol in model.symbols:
             if symbol.type is not SymbolType.Function:
                 continue
             match symbol.name:
@@ -62,7 +63,7 @@ class CliTabularView(ModelView):
         """Remove all classes from the schedule."""
         self.schedule = {day: {period: [] for period in Period} for day in Weekday}
 
-    def _update_model(self, model: Model) -> None:
+    def _update_model(self, model: ModelResult) -> None:
         """Load new model information into the object."""
         super()._update_model(model)
         self._clear_schedule()
@@ -73,7 +74,7 @@ class CliTabularView(ModelView):
 class CliTabulateView(TabulateView):
     """Model viewer that displays models as pretty CLI tables."""
 
-    def show_model(self, model: Model) -> None:
+    def show_model(self, model: ModelResult) -> None:
         """Displays the model as a pretty CLI table."""
         self._update_model(model)
 

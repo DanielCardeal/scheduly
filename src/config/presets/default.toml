@@ -1,6 +1,6 @@
 [clingo]
 num_models = 1
-time_limit = -1
+time_limit = 5
 threads = 4
 
 [constraints]
