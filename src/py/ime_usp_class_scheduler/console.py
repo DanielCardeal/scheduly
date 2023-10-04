@@ -1,5 +1,3 @@
-import readline
-
 from rich.console import Console
 
 console = Console()
