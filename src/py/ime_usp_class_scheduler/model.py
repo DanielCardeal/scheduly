@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Protocol, Sequence
 
 from attrs import field, frozen, validators
-from clingo import SymbolType
+from clingo import Model, SymbolType
 from clingo.symbol import Function, Number, String, Symbol
 from typing_extensions import Self
 
@@ -294,7 +294,7 @@ class JointedData:
     @classmethod
     def from_asp(cls, symbol: Symbol) -> Self:
         assert (
-            symbol.type is SymbolType.Function and symbol.name == "jointed"
+            symbol.type is SymbolType.Function and symbol.name == "joint"
         ), f"Unable to construct JointedData object from the given symbol: {str(symbol)}"
         course_id_a = symbol.arguments[0].string
         course_id_b = symbol.arguments[1].string
@@ -312,6 +312,12 @@ class ModelResult:
 
     symbols: Sequence[Symbol]
     cost: list[int]
+
+    @classmethod
+    def from_model(cls, model: Model) -> Self:
+        symbols = model.symbols(shown=True)
+        cost = model.cost
+        return cls(symbols, cost)
 
 
 def _asp_list_to_str(asp_list: list[Symbol]) -> str:

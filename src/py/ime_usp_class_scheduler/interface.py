@@ -83,7 +83,7 @@ class SolverInterface(ABC):
     @abstractmethod
     def _on_model(self, model: Model) -> None:
         """Callback for intercepting models generated from the ASP solver."""
-        self._best_models.append(ModelResult(model.symbols(shown=True), model.cost))
+        self._best_models.append(ModelResult.from_model(model))
 
     @abstractmethod
     def _on_finish(self, result: SolveResult) -> None:
@@ -211,7 +211,7 @@ class CliInterface(SolverInterface):
 
     def _on_finish(self, result: SolveResult) -> None:
         """Callback called once the search has concluded."""
-        console.rule("solving results")
+        console.rule("results")
         log_info(f"Solving status: {result}")
         log_info(f"Showing top {len(self._best_models)} results:")
         for model in self._best_models:
