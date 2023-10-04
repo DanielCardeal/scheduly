@@ -22,13 +22,13 @@ def class/4(
 )
 *%
 % Schedule non-jointed classes
-{ class(Course, Group, W, P): weekday(W), period(P) } == NumClasses :-
+{ class(Course, Group, W, P): available(Teacher, W, P) } == NumClasses :-
     not joint(Course, _),
     num_classes(Course, NumClasses),
-    lecturer(Course, Group, _).
+    lecturer(Course, Group, Teacher).
 
 % Schedule jointed classes
-{ class(CourseA, GroupA, W, P): weekday(W), period(P) } == NumClasses :-
+{ class(CourseA, GroupA, W, P): available(Teacher, W, P) } == NumClasses :-
     joint(CourseA, CourseB),
     num_classes(CourseA, NumClasses),
     lecturer(CourseA, GroupA, _).
@@ -70,7 +70,8 @@ conflict(Course1, Group1, Course2, Group2, Weekday, Period) :-
 Two classes taught by the same teacher cannot be in conflict with eachother,
 unless they are jointed.
 *%
-:- lecturer(CourseA, GroupA, Teacher),
+:- not joint(CourseA, CourseB),
+    lecturer(CourseA, GroupA, Teacher),
     lecturer(CourseB, GroupB, Teacher),
     conflict(CourseA, GroupA, CourseB, GroupB).
 
