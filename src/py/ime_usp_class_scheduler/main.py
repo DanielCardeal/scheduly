@@ -20,6 +20,7 @@ from ime_usp_class_scheduler.terminal import (
 
 @click.group()
 def main() -> None:
+    """A highly configurable timetabling tool."""
     pass
 
 
@@ -57,6 +58,7 @@ def cli(
     threads: Optional[int],
     model_out_path: Optional[Path],
 ) -> None:
+    """Create and display a nice timetable from the terminal."""
     try:
         configuration = load_preset(
             preset, num_models=num_models, time_limit=time_limit, threads=threads
@@ -73,18 +75,33 @@ def cli(
 
 
 @main.command()
-@click.argument("constraint-type", type=click.Choice(["hard", "soft"]), nargs=1)
-def new(constraint_type: str) -> None:
+@click.option(
+    "-t",
+    "--type",
+    "constraint_type",
+    type=click.Choice(["hard", "soft"], case_sensitive=False),
+    help="type of the constraint to be created",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="perform a trial run but don't write the changes",
+)
+def new(constraint_type: str, dry_run: bool) -> None:
+    """Add new rules for the underlying scheduler."""
+    if dry_run:
+        LOG_WARN("Running in 'dry_run' mode. Changes won't be saved to disk.")
+
+    if not constraint_type:
+        constraint_type = Prompt.ask("Constraint type", choices=["hard", "soft"])
+
     assert constraint_type in (
         "hard",
         "soft",
     ), f"Invalid constraint type: {constraint_type}"
 
-    name = Prompt.ask("Enter the constraint name")
-    if not name:
-        log_error("The constraint name cannot be empty.")
-        exit(1)
-    name = "_".join([word.lower() for word in name.split()])
+    constraint_name = PromptNonEmpty.ask("Enter the constraint name")
+    constraint_name = "_".join([word.lower() for word in constraint_name.split()])
 
     description = Prompt.ask(
         "Enter the constraint description",
@@ -93,7 +110,7 @@ def new(constraint_type: str) -> None:
     )
 
     if constraint_type == "hard":
-        path = HARD_CONSTRAINTS_DIR.joinpath(name).with_suffix(".lp")
+        path = HARD_CONSTRAINTS_DIR.joinpath(constraint_name).with_suffix(".lp")
         contents = dedent(
             f"""
         %*
@@ -103,27 +120,33 @@ def new(constraint_type: str) -> None:
         """
         )
     elif constraint_type == "soft":
-        path = SOFT_CONSTRAINTS_DIR.joinpath(name).with_suffix(".lp")
+        path = SOFT_CONSTRAINTS_DIR.joinpath(constraint_name).with_suffix(".lp")
         contents = dedent(
             f"""
         %*
         {description}
         *%
         :~ %* constraint logic *%.
-        [w_{name}@p_{name}, %* terms *% ]
+        [w_{constraint_name}@p_{constraint_name}, %* terms *% ]
         """
         )
 
-    if not path.exists() or Confirm.ask(
+    if path.exists() and not Confirm.ask(
         "There is already a soft constraint with this name. Override?"
     ):
+        LOG_ERROR("Aborted!")
+        exit(1)
+
+    if dry_run:
+        LOG_INFO(f"The following contents would be written to {path}:")
+    else:
+        LOG_INFO(f"Saving the following contents to {path}:")
+    # NOTE: Don't use rich because of soft constraint brackets
+    print(contents)
+
+    if not dry_run:
         with open(path, "w") as f:
             f.write(contents)
-        log_info(f"Created {path} with the following contents:")
-        # NOTE: Don't use rich because of soft constraint brackets
-        print(contents)
-    else:
-        log_info("Operation cancelled.")
 
 
 if __name__ == "__main__":
