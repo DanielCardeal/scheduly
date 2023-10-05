@@ -3,12 +3,19 @@ from textwrap import dedent
 from typing import Optional
 
 import click
-from rich.prompt import Confirm, Prompt
+from rich.prompt import Confirm
 
 from ime_usp_class_scheduler.configuration import load_preset
-from ime_usp_class_scheduler.console import log_error, log_exception, log_info
 from ime_usp_class_scheduler.constants import HARD_CONSTRAINTS_DIR, SOFT_CONSTRAINTS_DIR
 from ime_usp_class_scheduler.interface import CliInterface
+from ime_usp_class_scheduler.terminal import (
+    Prompt,
+    PromptNonEmpty,
+    LOG_ERROR,
+    LOG_EXCEPTION,
+    LOG_INFO,
+    LOG_WARN,
+)
 
 
 @click.group()
@@ -56,7 +63,7 @@ def cli(
         )
         interface = CliInterface(configuration)
     except Exception:
-        log_exception()
+        LOG_EXCEPTION()
         exit(1)
 
     if model_out_path is not None:

@@ -7,7 +7,6 @@ from pathlib import Path
 from clingo import Control, Model, SolveResult
 
 from ime_usp_class_scheduler.configuration import Configuration
-from ime_usp_class_scheduler.console import console, log_info
 from ime_usp_class_scheduler.constants import (
     CONSTRAINTS_DIR,
     HARD_CONSTRAINTS_DIR,
@@ -28,6 +27,7 @@ from ime_usp_class_scheduler.parser import (
     parse_curricula,
     parse_joint,
 )
+from ime_usp_class_scheduler.terminal import CONSOLE, LOG_INFO
 from ime_usp_class_scheduler.view import CliTabularView, ModelView
 
 
@@ -207,17 +207,17 @@ class CliInterface(SolverInterface):
     def _on_model(self, model: Model) -> None:
         """Callback for intercepting models generated from the ASP solver."""
         super()._on_model(model)
-        log_info(f"Current optimization: {model.cost}")
+        LOG_INFO(f"Current optimization: {model.cost}")
 
     def _on_finish(self, result: SolveResult) -> None:
         """Callback called once the search has concluded."""
-        console.rule("results")
-        log_info(f"Solving status: {result}")
-        log_info(f"Showing top {len(self._best_models)} results:")
+        CONSOLE.rule("results")
+        LOG_INFO(f"Solving status: {result}")
+        LOG_INFO(f"Showing top {len(self._best_models)} results:")
         for model in self._best_models:
             self._model_viewer.show_model(model)
 
     def run(self) -> None:
         """Begin searching for solutions using the Clingo solver."""
-        with console.status("[bold green]Searching for models..."):
+        with CONSOLE.status("[bold green]Searching for models..."):
             super().run()

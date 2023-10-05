@@ -5,7 +5,6 @@ from abc import ABC, abstractmethod
 from clingo import SymbolType
 from rich.table import Table
 
-from ime_usp_class_scheduler.console import console
 from ime_usp_class_scheduler.model import (
     ClassData,
     ConflictData,
@@ -14,6 +13,7 @@ from ime_usp_class_scheduler.model import (
     Period,
     Weekday,
 )
+from ime_usp_class_scheduler.terminal import CONSOLE
 
 
 class ModelView(ABC):
@@ -109,4 +109,4 @@ class CliTabularView(ModelView):
                 row.append("\n".join(self.schedule[w][p]))
             table.add_row(*row)
 
-        console.print(table)
+        CONSOLE.print(table)
