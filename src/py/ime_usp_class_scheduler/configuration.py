@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 from pathlib import Path
 from typing import Optional
 
@@ -9,6 +8,7 @@ import tomli
 from attr import Factory, define
 
 from ime_usp_class_scheduler.constants import PRESETS_DIR
+from ime_usp_class_scheduler.terminal import LOG_INFO, LOG_WARN
 
 
 class ConfigurationException(Exception):
@@ -99,11 +99,11 @@ def load_preset(
     if threads is not None:
         configuration.clingo.threads = threads
 
-    logging.info(f"Number of models: {configuration.clingo.num_models}")
-    logging.info(f"Time limit: {configuration.clingo.time_limit} seconds")
+    LOG_INFO("Number of models:", configuration.clingo.num_models)
+    LOG_INFO("Time limit (s):", configuration.clingo.time_limit)
     if configuration.clingo.threads == 1:
-        logging.warn("Using only 1 thread. Solving performance may be low.")
+        LOG_WARN("Using only one solving thread, performance might be low.")
     else:
-        logging.info(f"Number of threads: {configuration.clingo.threads}")
+        LOG_INFO("Number of threads:", configuration.clingo.threads)
 
     return configuration
