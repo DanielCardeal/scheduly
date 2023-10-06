@@ -71,6 +71,11 @@ def load_preset(
     time_limit: Optional[int] = None,
     threads: Optional[int] = None,
 ) -> Configuration:
+    """Loads configuration from a preset file.
+
+    If any of the keyword arguments is not None, the loader overwrites the
+    respective configuration key with the given value.
+    """
     preset_path = PRESETS_DIR.joinpath(preset).with_suffix(".toml")
     try:
         with open(preset_path, "rb") as f:
