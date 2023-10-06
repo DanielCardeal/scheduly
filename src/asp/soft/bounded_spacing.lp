@@ -1,4 +1,3 @@
-
 %*
 Bound the distance of days for classes of the same offering.
 *%

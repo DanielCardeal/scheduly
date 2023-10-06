@@ -1,4 +1,3 @@
-
 %*
 Classes from a course should be scheduled on the same period of the day.
 *%

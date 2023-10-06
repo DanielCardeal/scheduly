@@ -1,4 +1,3 @@
-
 %*
 Avoid conflicting with sciences and statistics courses for courses of ideal
 period greater or equal than 2.
