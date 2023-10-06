@@ -5,16 +5,16 @@ from typing import Optional
 import click
 from rich.prompt import Confirm
 
-from ime_usp_class_scheduler.configuration import load_preset
+from ime_usp_class_scheduler.configuration import ConfigurationException, load_preset
 from ime_usp_class_scheduler.constants import HARD_CONSTRAINTS_DIR, SOFT_CONSTRAINTS_DIR
 from ime_usp_class_scheduler.interface import CliInterface
 from ime_usp_class_scheduler.terminal import (
-    Prompt,
-    PromptNonEmpty,
     LOG_ERROR,
     LOG_EXCEPTION,
     LOG_INFO,
     LOG_WARN,
+    Prompt,
+    PromptNonEmpty,
 )
 
 
@@ -64,12 +64,16 @@ def cli(
             preset, num_models=num_models, time_limit=time_limit, threads=threads
         )
         interface = CliInterface(configuration)
-    except Exception:
-        LOG_EXCEPTION()
+    except ConfigurationException as e:
+        LOG_EXCEPTION(e)
         exit(1)
 
-    if model_out_path is not None:
-        interface.save_model(model_out_path)
+    try:
+        if model_out_path is not None:
+            interface.save_model(model_out_path)
+    except (FileNotFoundError, OSError, PermissionError) as e:
+        LOG_ERROR(f"Unable to save model to '{e.filename}': {e.__class__.__name__}")
+        exit(1)
 
     interface.run()
 

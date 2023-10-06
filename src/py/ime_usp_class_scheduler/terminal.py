@@ -1,5 +1,6 @@
 from functools import partial
 
+from cattrs import ClassValidationError, transform_error
 from rich.console import Console
 from rich.prompt import InvalidResponse, PromptBase
 
@@ -51,5 +52,9 @@ LOG_WARN = partial(CONSOLE.log, _WARN_PREAMBLE)
 LOG_ERROR = partial(CONSOLE.log, _ERR_PREAMBLE)
 """Logs an error to stderr."""
 
-LOG_EXCEPTION = partial(CONSOLE.print_exception, show_locals=True)
-"""Logs an exception to stderr."""
+
+def LOG_EXCEPTION(e: Exception) -> None:
+    """Logs an exception to stderr."""
+    name = e.__class__.__name__
+    exception_name = f"([dim white]{name}[/])"
+    LOG_ERROR(exception_name, e)

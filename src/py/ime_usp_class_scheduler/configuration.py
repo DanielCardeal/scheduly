@@ -75,14 +75,18 @@ def load_preset(
     try:
         with open(preset_path, "rb") as f:
             configuration_dict = tomli.load(f)
+        configuration = cattrs.structure(configuration_dict, Configuration)
     except tomli.TOMLDecodeError as e:
         raise ConfigurationException(
             f"TOML syntax error in preset file {preset_path}:\n{e}"
         )
     except FileNotFoundError as e:
         raise ConfigurationException(f"Unable to find preset file {preset_path}.")
+    except cattrs.ClassValidationError as e:
+        # Capture the first error and raise it as a ConfigurationException
+        message = cattrs.transform_error(e)[0]
+        raise ConfigurationException(f"Malformed preset file {preset_path}: {message}")
 
-    configuration = cattrs.structure(configuration_dict, Configuration)
 
     if num_models is not None:
         configuration.clingo.num_models = num_models
