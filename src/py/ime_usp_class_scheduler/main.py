@@ -29,19 +29,28 @@ def main() -> None:
     "-p",
     "--preset",
     default="default",
-    help="filename (without extension) of TOML preset file.",
+    help="Load preset by name.",
 )
 @click.option(
-    "-n", "--num-models", required=False, help="number of models to be generated"
+    "-n",
+    "--num-schedules",
+    required=False,
+    type=int,
+    help="Number (N > 0) of schedules to create.",
 )
 @click.option(
-    "-t", "--time-limit", required=False, help="limit execution time to <n> seconds."
+    "-t",
+    "--time-limit",
+    required=False,
+    type=int,
+    help="Limit execution time to N seconds.",
 )
 @click.option(
     "-j",
     "--threads",
     required=False,
-    help="number of threads to use for solving. "
+    type=int,
+    help="Number of threads to use for solving. "
     "A value of 0 or less uses all of the threads available in the system.",
 )
 @click.option(
@@ -89,12 +98,12 @@ def cli(
     "--type",
     "constraint_type",
     type=click.Choice(["hard", "soft"], case_sensitive=False),
-    help="type of the constraint to be created",
+    help="Type of the constraint to be created",
 )
 @click.option(
     "--dry-run",
     is_flag=True,
-    help="perform a trial run but don't write the changes",
+    help="Perform a trial run but don't write the changes",
 )
 def new(constraint_type: str, dry_run: bool) -> None:
     """Add new rules for the underlying scheduler."""
