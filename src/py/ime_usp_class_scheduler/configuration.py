@@ -6,7 +6,7 @@ from typing import Optional
 
 import cattrs
 import tomli
-from attr import define
+from attr import Factory, define
 
 from ime_usp_class_scheduler.constants import PRESETS_DIR
 
@@ -27,17 +27,17 @@ class Configuration:
 class ClingoOptions:
     """Configuration options for the underlying clingo solver"""
 
-    num_models: int
-    time_limit: int
-    threads: int
+    num_models: int = 1
+    time_limit: int = 30
+    threads: int = 1
 
 
 @define
 class ConstraintsConfiguration:
     """Configurations related to constraints of the scheduler"""
 
-    hard: list[HardConstraintsConfiguration]
-    soft: list[SoftConstraintsConfiguration]
+    hard: list[HardConstraintsConfiguration] = Factory(list)
+    soft: list[SoftConstraintsConfiguration] = Factory(list)
 
 
 @define
@@ -86,7 +86,6 @@ def load_preset(
         # Capture the first error and raise it as a ConfigurationException
         message = cattrs.transform_error(e)[0]
         raise ConfigurationException(f"Malformed preset file {preset_path}: {message}")
-
 
     if num_models is not None:
         configuration.clingo.num_models = num_models
