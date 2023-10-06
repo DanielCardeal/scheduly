@@ -67,7 +67,7 @@ class SoftConstraintsConfiguration:
 def load_preset(
     preset: str,
     /,
-    num_models: Optional[int] = None,
+    num_schedules: Optional[int] = None,
     time_limit: Optional[int] = None,
     threads: Optional[int] = None,
 ) -> Configuration:
@@ -92,8 +92,8 @@ def load_preset(
         message = cattrs.transform_error(e)[0]
         raise ConfigurationException(f"Malformed preset file {preset_path}: {message}")
 
-    if num_models is not None:
-        configuration.clingo.num_models = num_models
+    if num_schedules is not None:
+        configuration.clingo.num_models = num_schedules
     if time_limit is not None:
         configuration.clingo.time_limit = time_limit
     if threads is not None:

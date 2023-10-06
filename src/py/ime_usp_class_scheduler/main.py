@@ -7,7 +7,7 @@ from rich.prompt import Confirm
 
 from ime_usp_class_scheduler.configuration import ConfigurationException, load_preset
 from ime_usp_class_scheduler.constants import HARD_CONSTRAINTS_DIR, SOFT_CONSTRAINTS_DIR
-from ime_usp_class_scheduler.interface import CliInterface
+from ime_usp_class_scheduler.program import CliProgram
 from ime_usp_class_scheduler.terminal import (
     LOG_ERROR,
     LOG_EXCEPTION,
@@ -45,37 +45,42 @@ def main() -> None:
     "A value of 0 or less uses all of the threads available in the system.",
 )
 @click.option(
-    "--save-model",
-    "model_out_path",
+    "-o",
+    "--output_model",
+    "output_model",
     required=False,
-    help="Save underlying clingo program - with inputs - to {file}.",
-    type=click.Path(file_okay=True, dir_okay=False),
+    type=click.Path(path_type=Path),
+    help="Output generated ASP program to PATH",
 )
 def cli(
     preset: str,
-    num_models: Optional[int],
+    num_schedules: Optional[int],
     time_limit: Optional[int],
     threads: Optional[int],
-    model_out_path: Optional[Path],
+    output_model: Optional[Path],
 ) -> None:
     """Create and display a nice timetable from the terminal."""
     try:
         configuration = load_preset(
-            preset, num_models=num_models, time_limit=time_limit, threads=threads
+            preset, num_schedules=num_schedules, time_limit=time_limit, threads=threads
         )
-        interface = CliInterface(configuration)
+        program = CliProgram(configuration)
+        if output_model is not None:
+            if not output_model.exists() or Confirm.ask(
+                f"{output_model} file already exists, overwrite?"
+            ):
+                program.save_model(output_model)
+                LOG_INFO(f"Starting model saved to {output_model}")
+            else:
+                LOG_WARN("Aborted saving model to disk")
+
+        program.start()
     except ConfigurationException as e:
         LOG_EXCEPTION(e)
         exit(1)
-
-    try:
-        if model_out_path is not None:
-            interface.save_model(model_out_path)
     except (FileNotFoundError, OSError, PermissionError) as e:
         LOG_ERROR(f"Unable to save model to '{e.filename}': {e.__class__.__name__}")
         exit(1)
-
-    interface.run()
 
 
 @main.command()
