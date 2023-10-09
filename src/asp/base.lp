@@ -15,6 +15,14 @@ Ensures joint/2 is symmetric
 joint(CourseB, CourseA) :- joint(CourseA, CourseB).
 
 %*
+def primary_lecturer(course id, group id, teacher id)
+*%
+primary_lecturer(Course, Group, Teacher) :-
+    lecturer(Course, Group, Teacher),
+    availability(Teacher, N),
+    N = #min { OtherN: lecturer(Course, Group, OtherTeacher),  availability(OtherTeacher, OtherN)}.
+
+%*
 def class/4(
     course id,
     offering group,

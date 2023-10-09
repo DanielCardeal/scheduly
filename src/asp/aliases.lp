@@ -29,6 +29,11 @@ def is_obligatory/1(course id)
 is_obligatory(Course) :- curriculum_component("obligatory", Course, _).
 
 %*
+def lecturer/1(teacher id)
+*%
+teacher(Teacher) :- lecturer(_, _, Teacher).
+
+%*
 def conflict/4(
     course A id,
     course A group,
@@ -56,3 +61,11 @@ _conflict(CourseA, GroupA, CourseB, GroupB, Weekday, Period) :-
 def _joint/2(course A id, course B id)
 *%
 _joint(CourseA, CourseB) :- joint(CourseA, CourseB), CourseA > CourseB.
+
+%*
+availability/2(teacher id, number of available teaching periods)
+*%
+availability(Teacher, N) :-
+    teacher(Teacher),
+    N = #count { W, P: available(Teacher, W, P) }.
+

@@ -60,10 +60,6 @@ This page lists and explains all of the predicates and values used within the pr
 
 ### Teachers' information
 
-+ `teacher/1(teacher id)`
-
-  Identifies a teacher in the scheduler
-
 + `available/3(teacher id, weekday, period)`
 
   Indicates which day/period a teacher is available to teach.
@@ -74,15 +70,21 @@ This page lists and explains all of the predicates and values used within the pr
 
 ### Offerings' information
 
++ `class/4(course id, offering group, weekday, period)`
+
+  Schedule a class of a given course to a weekday
+
 + `lecturer/3(course id, offering group, teacher id)`
 
   Assign `teacher` as the lecturer of `course` in this given semester. Note that
   there could be multiple instances for a same course/offering group, which
   means more than one teacher is assigned to the same class.
 
-+ `class/4(course id, offering group, weekday, period)`
++ `primary_lecturer/3(course id, offering group, teacher id)`
 
-  Schedule a class of a given course to a weekday
+  Mark a teacher as the primary teacher for a course. The primary teacher for a
+  course is the teacher with the lowest availability between all the lecturers
+  of a class.
 
 + `conflict/6(first course id, first course group, second course group, second course group, weekday, period)`
 
@@ -104,6 +106,15 @@ writing rules in a more concise manner.
 + `is_double/1(course id)`
 + `is_undergrad/1(course id)`
 + `is_obligatory(course id)`
+
++ `teacher/1(teacher id)`
+
+  A teacher in the scheduler. Teacher information is extracted from `lecturer`
+  clauses.
+
++ `availability/2(teacher id, number of available teaching periods)`
+
+  Count the number of available teaching days for a given teacher.
 
 + `conflict/4(course A id, course A group, course B id, course B group)`
 
