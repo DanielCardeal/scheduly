@@ -120,12 +120,12 @@ writing rules in a more concise manner.
 
   Shorter version of `conflict` that ignores the time of conflict.
 
-+ `\_conflict/6(course A id, course A group, course B id, course B group, conflict weekday, conflict period)`
++ `_conflict/6(course A id, course A group, course B id, course B group, conflict weekday, conflict period)`
 
-  Ordered (non-symmetric) version of `conflict`. Useful whenever creating rules
+  Ordered (non symmetric) version of `conflict`. Useful whenever creating rules
   that should be counted only once per conflict (such as `avoid_all_conflicts`).
 
-+ `\_joint/2(course A id, course B id)`
++ `_joint/2(course A id, course B id)`
 
-  Ordered (non-symmetric) version of `joint`. Useful whenever is necessary to
+  Ordered (non symmetric) version of `joint`. Useful whenever is necessary to
   access one instance of a jointed classes pair.
