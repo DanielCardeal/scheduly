@@ -113,3 +113,8 @@ writing rules in a more concise manner.
 
   Ordered (non-symmetric) version of `conflict`. Useful whenever creating rules
   that should be counted only once per conflict (such as `avoid_all_conflicts`).
+
++ `\_joint/2(course A id, course B id)`
+
+  Ordered (non-symmetric) version of `joint`. Useful whenever is necessary to
+  access one instance of a jointed classes pair.

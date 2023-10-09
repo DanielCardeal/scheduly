@@ -52,3 +52,7 @@ _conflict(CourseA, GroupA, CourseB, GroupB, Weekday, Period) :-
     conflict(CourseA, GroupA, CourseB, GroupB, Weekday, Period),
     CourseA > CourseB.
 
+%*
+def _joint/2(course A id, course B id)
+*%
+_joint(CourseA, CourseB) :- joint(CourseA, CourseB), CourseA > CourseB.
