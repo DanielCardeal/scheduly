@@ -59,6 +59,7 @@ class DefaultSolver(Solver):
         self._model += program + "\n"
         self._control.add(program)
 
+    @property
     def model(self) -> str:
         """Returns the string representation of the model."""
         return self._model
