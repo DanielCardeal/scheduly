@@ -37,3 +37,18 @@ def conflict/4(
 )
 *%
 conflict(CourseA, GroupA, CourseB, GroupB) :- conflict(CourseA, GroupA, CourseB, GroupB, _, _).
+
+%*
+def _conflict/6(
+    course A id,
+    course A group,
+    course B id,
+    course B group,
+    conflict weekday,
+    conflict period
+)
+*%
+_conflict(CourseA, GroupA, CourseB, GroupB, Weekday, Period) :-
+    conflict(CourseA, GroupA, CourseB, GroupB, Weekday, Period),
+    CourseA > CourseB.
+

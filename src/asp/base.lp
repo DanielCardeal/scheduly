@@ -51,20 +51,19 @@ def conflict/6(
 )
 *%
 % Class conflict
-conflict(Course1, Group1, Course2, Group2, Weekday, Period) :-
-    class(Course1, Group1, Weekday, Period),
-    class(Course2, Group2, Weekday, Period),
-    not joint(Course1, Course2),
-    Course1 != Course2.
+conflict(CourseA, GroupA, CourseB, GroupB, Weekday, Period) :-
+    class(CourseA, GroupA, Weekday, Period),
+    class(CourseB, GroupB, Weekday, Period),
+    not joint(CourseA, CourseB),
+    CourseA != CourseB.
 
 % Group conflict
-conflict(Course1, Group1, Course2, Group2, Weekday, Period) :-
-    class(Course1, Group1, Weekday, Period),
-    class(Course2, Group2, Weekday, Period),
-    not joint(Course1, Course2),
-    Course1 == Course2,
-    Group1 != Group2.
-
+conflict(CourseA, GroupA, CourseB, GroupB, Weekday, Period) :-
+    class(CourseA, GroupA, Weekday, Period),
+    class(CourseB, GroupB, Weekday, Period),
+    not joint(CourseA, CourseB),
+    CourseA == CourseB,
+    GroupA != GroupB.
 
 %*
 Two classes taught by the same teacher cannot be in conflict with eachother,

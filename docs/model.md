@@ -89,7 +89,10 @@ This page lists and explains all of the predicates and values used within the pr
   Register schedule conflicts between two different courses or two different
   offerings of the same course. Conflicts occur when two classes occur in the
   same period and weekday. Note that `jointed` classes don't count as
-  conflicting by the scheduler.
+  conflicting to the scheduler.
+
+  > NOTE: `conflict` is symmetric, which means there are always two `conflict`
+  > predicates for each pair of conflicting classes in a schedule.
 
 ### Aliases
 
@@ -101,4 +104,12 @@ writing rules in a more concise manner.
 + `is_double/1(course id)`
 + `is_undergrad/1(course id)`
 + `is_obligatory(course id)`
+
 + `conflict/4(course A id, course A group, course B id, course B group)`
+
+  Shorter version of `conflict` that ignores the time of conflict.
+
++ `\_conflict/6(course A id, course A group, course B id, course B group, conflict weekday, conflict period)`
+
+  Ordered (non-symmetric) version of `conflict`. Useful whenever creating rules
+  that should be counted only once per conflict (such as `avoid_all_conflicts`).
