@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from clingo import Symbol, SymbolType
 from rich.table import Table
@@ -26,7 +27,7 @@ class ModelView(ABC):
     def __init__(self) -> None:
         super().__init__()
         self.schedule: dict[Weekday, dict[Period, set[str]]] = {}
-        self.symbols: dict[str, set[Symbol]] = {}
+        self.symbols: dict[str, list[list[Any]]] = {}
         self._clear_schedule()
 
     @abstractmethod
@@ -64,8 +65,9 @@ class ModelView(ABC):
                     continue
                 case name:
                     if name not in self.symbols:
-                        self.symbols[name] = set()
-                    self.symbols[name].add(symbol)
+                        self.symbols[name] = []
+                    symbol_str_repr = _get_symbol_arguments(symbol)
+                    self.symbols[name].append(symbol_str_repr)
 
         for class_ in self.classes:
             if class_.course_id not in self.jointed:
@@ -108,3 +110,15 @@ class CliTabularView(ModelView):
             table.add_row(*row)
 
         CONSOLE.print(table)
+
+
+def _get_symbol_arguments(symbol: Symbol) -> list[Any]:
+    args: list[Any] = []
+    for arg in symbol.arguments:
+        match arg.type:
+            case SymbolType.Number:
+                args.append(arg.number)
+                pass
+            case SymbolType.String:
+                args.append(arg.string)
+    return args
