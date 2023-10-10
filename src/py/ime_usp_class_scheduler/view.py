@@ -54,7 +54,6 @@ class ModelView(ABC):
             match symbol.name:
                 case "class":
                     self.classes.add(ClassData.from_asp(symbol))
-                    continue
                 case "_joint":
                     jointed_classes = JointedData.from_asp(symbol)
                     self.jointed[
@@ -63,12 +62,11 @@ class ModelView(ABC):
                     self.jointed[
                         jointed_classes.course_id_b
                     ] = jointed_classes.course_id_a
-                    continue
-                case name:
-                    if name not in self.symbols:
-                        self.symbols[name] = []
-                    symbol_str_repr = _get_symbol_arguments(symbol)
-                    self.symbols[name].append(symbol_str_repr)
+
+            if symbol.name not in self.symbols:
+                self.symbols[symbol.name] = []
+            symbol_list_repr = _get_symbol_arguments(symbol)
+            self.symbols[symbol.name].append(symbol_list_repr)
 
         for class_ in self.classes:
             if class_.course_id not in self.jointed:

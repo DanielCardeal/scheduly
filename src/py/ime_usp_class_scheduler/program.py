@@ -4,6 +4,7 @@ from pathlib import Path
 
 import rich
 from clingo import Model, SolveResult
+from rich.json import JSON
 
 from ime_usp_class_scheduler.configuration import Configuration
 from ime_usp_class_scheduler.constants import (
@@ -126,7 +127,7 @@ class CliProgram(Program):
             self._model_viewer.show_model(model)
 
         if self._dump_symbols:
-            rich.print(self._model_viewer.symbols)
+            rich.print(JSON.from_data(self._model_viewer.symbols))
 
     def _load_inputs(self) -> list[IntoASP]:
         """
