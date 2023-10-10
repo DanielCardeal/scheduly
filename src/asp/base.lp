@@ -90,5 +90,3 @@ Classes must respect the lecturer(s)' available times.
     not available(Teacher, Weekday, Period).
 
 #show class/4.
-#show joint/2.
-#show conflict/6.
