@@ -37,15 +37,15 @@ class Weekday(Enum):
     def __str__(self) -> str:
         match self:
             case Weekday.MONDAY:
-                return "monday"
+                return "Monday"
             case Weekday.TUESDAY:
-                return "tuesday"
+                return "Tuesday"
             case Weekday.WEDNESDAY:
-                return "wednesday"
+                return "Wednesday"
             case Weekday.THURSDAY:
-                return "thursday"
+                return "Thursday"
             case Weekday.FRIDAY:
-                return "friday"
+                return "Friday"
 
 
 class Period(Enum):
