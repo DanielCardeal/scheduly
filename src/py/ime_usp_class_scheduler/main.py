@@ -43,8 +43,7 @@ def main() -> None:
     "--threads",
     required=False,
     type=int,
-    help="Number of threads to use for solving. "
-    "A value of 0 or less uses all of the threads available in the system.",
+    help="Number (N > 1) of threads to use for solving.",
 )
 @click.option(
     "-o",

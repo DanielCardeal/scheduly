@@ -101,7 +101,9 @@ def load_preset(
 
     LOG_INFO("Number of models:", configuration.clingo.num_models)
     LOG_INFO("Time limit (s):", configuration.clingo.time_limit)
-    if configuration.clingo.threads == 1:
+    if configuration.clingo.threads <= 0:
+        raise ConfigurationException("Number of solving threads must be >= 1.")
+    elif configuration.clingo.threads == 1:
         LOG_WARN("Using only one solving thread, performance might be low.")
     else:
         LOG_INFO("Number of threads:", configuration.clingo.threads)
