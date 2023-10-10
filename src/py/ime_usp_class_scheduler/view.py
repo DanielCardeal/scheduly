@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 from clingo import Symbol, SymbolType
+from rich.box import ROUNDED
 from rich.table import Table
 
 from ime_usp_class_scheduler.log import CONSOLE
@@ -102,6 +103,8 @@ class CliTabularView(ModelView):
         table = Table(
             *headers,
             title=f"Optimization: {model.cost}",
+            box=ROUNDED,
+            show_lines=True,
         )
         for p in Period:
             row = [str(p)]
@@ -110,6 +113,7 @@ class CliTabularView(ModelView):
             table.add_row(*row)
 
         CONSOLE.print(table)
+        CONSOLE.print()
 
 
 def _get_symbol_arguments(symbol: Symbol) -> list[Any]:
