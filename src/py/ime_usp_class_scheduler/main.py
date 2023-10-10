@@ -129,7 +129,7 @@ def new(constraint_type: str, dry_run: bool) -> None:
     if constraint_type == "hard":
         path = HARD_CONSTRAINTS_DIR.joinpath(constraint_name).with_suffix(".lp")
         contents = dedent(
-            f"""
+            f"""\
         %*
         {description}
         *%
@@ -139,7 +139,7 @@ def new(constraint_type: str, dry_run: bool) -> None:
     elif constraint_type == "soft":
         path = SOFT_CONSTRAINTS_DIR.joinpath(constraint_name).with_suffix(".lp")
         contents = dedent(
-            f"""
+            f"""\
         %*
         {description}
         *%
