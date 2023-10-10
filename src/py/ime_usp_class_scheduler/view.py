@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from clingo import SymbolType
+from clingo import Symbol, SymbolType
 from rich.table import Table
 
 from ime_usp_class_scheduler.log import CONSOLE
@@ -25,14 +25,23 @@ class ModelView(ABC):
 
     def __init__(self) -> None:
         super().__init__()
+        self.schedule: dict[Weekday, dict[Period, set[str]]] = {}
+        self.symbols: dict[str, set[Symbol]] = {}
+        self._clear_schedule()
 
     @abstractmethod
     def show_model(self, model: ModelResult) -> None:
         """Displays a model."""
         ...
 
-    def _update_model(self, model: ModelResult) -> None:
+    def _clear_schedule(self) -> None:
+        """Remove all classes from the schedule."""
+        self.schedule = {day: {period: set() for period in Period} for day in Weekday}
+        self.symbols = {}
+
+    def _update_schedule(self, model: ModelResult) -> None:
         """Load new model information into the object."""
+        self._clear_schedule()
         self.classes = set()
         self.conflicts = set()
         self.jointed = dict()
@@ -43,7 +52,8 @@ class ModelView(ABC):
             match symbol.name:
                 case "class":
                     self.classes.add(ClassData.from_asp(symbol))
-                case "joint":
+                    continue
+                case "_joint":
                     jointed_classes = JointedData.from_asp(symbol)
                     self.jointed[
                         jointed_classes.course_id_a
@@ -51,28 +61,12 @@ class ModelView(ABC):
                     self.jointed[
                         jointed_classes.course_id_b
                     ] = jointed_classes.course_id_a
-                case "conflict":
-                    self.conflicts.add(ConflictData.from_asp(symbol))
-                case _:
-                    pass
+                    continue
+                case name:
+                    if name not in self.symbols:
+                        self.symbols[name] = set()
+                    self.symbols[name].add(symbol)
 
-
-class CliTabularView(ModelView):
-    """Model viewer that displays models as pretty CLI tables."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.schedule: dict[Weekday, dict[Period, set[str]]] = {}
-        self._clear_schedule()
-
-    def _clear_schedule(self) -> None:
-        """Remove all classes from the schedule."""
-        self.schedule = {day: {period: set() for period in Period} for day in Weekday}
-
-    def _update_model(self, model: ModelResult) -> None:
-        """Load new model information into the object."""
-        super()._update_model(model)
-        self._clear_schedule()
         for class_ in self.classes:
             if class_.course_id not in self.jointed:
                 self.schedule[class_.weekday][class_.period].add(class_.course_id)
@@ -94,9 +88,13 @@ class CliTabularView(ModelView):
                     f"{class_.course_id} - {jointed_class}"
                 )
 
+
+class CliTabularView(ModelView):
+    """Model viewer that displays models as pretty CLI tables."""
+
     def show_model(self, model: ModelResult) -> None:
         """Displays the model as a pretty CLI table."""
-        self._update_model(model)
+        self._update_schedule(model)
 
         headers = ["Period", *[str(w) for w in Weekday]]
         table = Table(

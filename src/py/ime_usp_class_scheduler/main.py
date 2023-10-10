@@ -54,19 +54,26 @@ def main() -> None:
     type=click.Path(path_type=Path),
     help="Output generated ASP program to PATH",
 )
+@click.option(
+    "-D",
+    "--dump-symbols",
+    is_flag=True,
+    help="Dump a JSON with all shown symbols to stdout.",
+)
 def cli(
     preset: str,
     num_schedules: Optional[int],
     time_limit: Optional[int],
     threads: Optional[int],
     output_model: Optional[Path],
+    dump_symbols: bool,
 ) -> None:
     """Create and display a nice timetable from the terminal."""
     try:
         configuration = load_preset(
             preset, num_schedules=num_schedules, time_limit=time_limit, threads=threads
         )
-        program = CliProgram(configuration)
+        program = CliProgram(configuration, dump_symbols=dump_symbols)
         if output_model is not None:
             if not output_model.exists() or Confirm.ask(
                 f"{output_model} file already exists, overwrite?"

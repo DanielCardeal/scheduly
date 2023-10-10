@@ -293,8 +293,9 @@ class JointedData:
 
     @classmethod
     def from_asp(cls, symbol: Symbol) -> Self:
-        assert (
-            symbol.type is SymbolType.Function and symbol.name == "joint"
+        assert symbol.type is SymbolType.Function and symbol.name in (
+            "joint",
+            "_joint",
         ), f"Unable to construct JointedData object from the given symbol: {str(symbol)}"
         course_id_a = symbol.arguments[0].string
         course_id_b = symbol.arguments[1].string
