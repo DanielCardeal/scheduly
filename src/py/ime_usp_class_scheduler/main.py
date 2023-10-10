@@ -3,7 +3,6 @@ from textwrap import dedent
 from typing import Optional
 
 import click
-from rich.prompt import Confirm
 
 from ime_usp_class_scheduler.configuration import ConfigurationException, load_preset
 from ime_usp_class_scheduler.constants import HARD_CONSTRAINTS_DIR, SOFT_CONSTRAINTS_DIR
@@ -13,6 +12,7 @@ from ime_usp_class_scheduler.terminal import (
     LOG_EXCEPTION,
     LOG_INFO,
     LOG_WARN,
+    Confirm,
     Prompt,
     PromptNonEmpty,
 )
