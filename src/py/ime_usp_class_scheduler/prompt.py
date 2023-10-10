@@ -1,16 +1,11 @@
-from functools import partial
 from typing import Optional, TextIO
 
 import rich.prompt
 from rich.console import Console
-from rich.prompt import InvalidResponse, PromptType
+from rich.prompt import DefaultType, InvalidResponse, PromptType
 from rich.text import Text, TextType
 
-CONSOLE = Console(stderr=True, log_time=False)
-
-_ERR_PREAMBLE = "[dim red]ERROR[/]"
-_INFO_PREAMBLE = "[dim cyan]INFO[/]"
-_WARN_PREAMBLE = "[dim yellow]WARN[/]"
+from ime_usp_class_scheduler.log import CONSOLE, LOG_ERROR
 
 
 class PromptBase(rich.prompt.PromptBase[PromptType]):
@@ -58,7 +53,7 @@ class Confirm(PromptBase[bool]):
     validate_error_message = "Please enter Y or N"
     choices: list[str] = ["yes", "no"]
 
-    def render_default(self, default: bool) -> Text:
+    def render_default(self, default: DefaultType) -> Text:
         """Render the default as (y) or (n) rather than True/False."""
         yes, no = self.choices
         return Text(f"({yes})" if default else f"({no})", style="prompt.default")
@@ -90,20 +85,3 @@ class PromptNonEmpty(Prompt):
         if not value:
             raise InvalidResponse(self.validate_error_message)
         return value
-
-
-LOG_INFO = partial(CONSOLE.log, _INFO_PREAMBLE)
-"""Logs an exception to stderr."""
-
-LOG_WARN = partial(CONSOLE.log, _WARN_PREAMBLE)
-"""Logs a warning to stderr."""
-
-LOG_ERROR = partial(CONSOLE.log, _ERR_PREAMBLE)
-"""Logs an error to stderr."""
-
-
-def LOG_EXCEPTION(e: Exception) -> None:
-    """Logs an exception to stderr."""
-    name = e.__class__.__name__
-    exception_name = f"([dim white]{name}[/])"
-    LOG_ERROR(exception_name, e)

@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from clingo import SymbolType
 from rich.table import Table
 
+from ime_usp_class_scheduler.log import CONSOLE
 from ime_usp_class_scheduler.model import (
     ClassData,
     ConflictData,
@@ -13,7 +14,6 @@ from ime_usp_class_scheduler.model import (
     Period,
     Weekday,
 )
-from ime_usp_class_scheduler.terminal import CONSOLE
 
 
 class ModelView(ABC):

@@ -6,16 +6,9 @@ import click
 
 from ime_usp_class_scheduler.configuration import ConfigurationException, load_preset
 from ime_usp_class_scheduler.constants import HARD_CONSTRAINTS_DIR, SOFT_CONSTRAINTS_DIR
+from ime_usp_class_scheduler.log import LOG_ERROR, LOG_EXCEPTION, LOG_INFO, LOG_WARN
 from ime_usp_class_scheduler.program import CliProgram
-from ime_usp_class_scheduler.terminal import (
-    LOG_ERROR,
-    LOG_EXCEPTION,
-    LOG_INFO,
-    LOG_WARN,
-    Confirm,
-    Prompt,
-    PromptNonEmpty,
-)
+from ime_usp_class_scheduler.prompt import Confirm, Prompt, PromptNonEmpty
 
 
 @click.group()

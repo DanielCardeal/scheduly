@@ -11,6 +11,7 @@ from ime_usp_class_scheduler.constants import (
     INPUT_DIR,
     SOFT_CONSTRAINTS_DIR,
 )
+from ime_usp_class_scheduler.log import CONSOLE, LOG_INFO, LOG_WARN
 from ime_usp_class_scheduler.model import (
     IntoASP,
     ModelResult,
@@ -26,7 +27,6 @@ from ime_usp_class_scheduler.parser import (
     parse_joint,
 )
 from ime_usp_class_scheduler.solver import DefaultSolver, Solver
-from ime_usp_class_scheduler.terminal import CONSOLE, LOG_INFO, LOG_WARN
 from ime_usp_class_scheduler.view import CliTabularView, ModelView
 
 

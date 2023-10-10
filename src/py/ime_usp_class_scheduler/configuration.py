@@ -8,7 +8,7 @@ import tomli
 from attr import Factory, define
 
 from ime_usp_class_scheduler.constants import PRESETS_DIR
-from ime_usp_class_scheduler.terminal import LOG_INFO, LOG_WARN
+from ime_usp_class_scheduler.log import LOG_INFO, LOG_WARN
 
 
 class ConfigurationException(Exception):
