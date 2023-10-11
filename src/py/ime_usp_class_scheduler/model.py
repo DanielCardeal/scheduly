@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime as dt
 from enum import Enum
 from typing import Protocol, Sequence
 
@@ -66,6 +67,40 @@ class Period(Enum):
                 return "14:00 - 15:40"
             case Period.AFTERNOON_2:
                 return "16:00 - 17:40"
+
+    @classmethod
+    def intersections(cls, start: dt.time, end: dt.time) -> list[Period]:
+        """
+        Return the list of periods that are intersected by `start` and `end`.
+
+        >>> Period.intersections(dt.time(8, 0), dt.time(9, 0))
+        [<Period.MORNING_1: 0>]
+
+        >>> Period.intersections(dt.time(7, 30), dt.time(10, 10))
+        [<Period.MORNING_1: 0>, <Period.MORNING_2: 1>]
+
+        >>> Period.intersections(dt.time(13, 0), dt.time(16, 0))
+        [<Period.AFTERNOON_1: 2>]
+
+        >>> Period.intersections(dt.time(11, 30), dt.time(12, 30))
+        [<Period.MORNING_2: 1>]
+
+        >>> Period.intersections(dt.time(19, 0), dt.time(20, 40))
+        []
+        """
+        if end < start:
+            start, end = end, start
+
+        intersections = []
+        if start <= dt.time(8, 0) < end or start < dt.time(9, 40) <= end:
+            intersections.append(Period.MORNING_1)
+        if start <= dt.time(10, 0) < end or start < dt.time(11, 40) <= end:
+            intersections.append(Period.MORNING_2)
+        if start <= dt.time(14, 0) < end or start < dt.time(15, 40) <= end:
+            intersections.append(Period.AFTERNOON_1)
+        if start <= dt.time(16, 0) < end or start < dt.time(17, 40) <= end:
+            intersections.append(Period.AFTERNOON_2)
+        return intersections
 
 
 @frozen

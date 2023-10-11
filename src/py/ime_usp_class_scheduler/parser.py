@@ -38,40 +38,21 @@ def _get_timeslots(weekday: Weekday, input: str) -> set[ScheduleTimeslot]:
     if not input:
         return set()
 
-    preferred_time: set[ScheduleTimeslot] = set()
+    timeslots: set[ScheduleTimeslot] = set()
     for time_range in input.split(";"):
-        start_time = time_range.split("-")[0]
-        time = dt.datetime.strptime(start_time, "%H:%M").time()
-        period = _time_to_period(time)
-        if period:
-            preferred_time.add(ScheduleTimeslot(weekday, period))
+        try:
+            [start_time_str, end_time_str] = time_range.split("-")
+        except ValueError:
+            raise ParserException(
+                f"Badly formatted time interval {input}. Expected HH:MM-HH:MM format."
+            )
+        start_time = dt.datetime.strptime(start_time_str, "%H:%M").time()
+        end_time = dt.datetime.strptime(end_time_str, "%H:%M").time()
+        periods = Period.intersections(start_time, end_time)
+        for period in periods:
+            timeslots.add(ScheduleTimeslot(weekday, period))
 
-    return preferred_time
-
-
-def _time_to_period(time: dt.time) -> Period | None:
-    """
-    Return the time period that intersects a given time_input. If the time
-    period doesn't match any time periods, returns -1.
-
-    >>> _time_to_period(dt.time(7, 40))
-
-    >>> _time_to_period(dt.time(8, 34)) == Period.MORNING_1
-    True
-    >>> _time_to_period(dt.time(10, 00)) == Period.MORNING_2
-    True
-    >>> _time_to_period(dt.time(15, 10)) == Period.AFTERNOON_1
-    True
-    """
-    if dt.time(8, 0) <= time <= dt.time(9, 40):
-        return Period.MORNING_1
-    elif dt.time(10, 0) <= time <= dt.time(11, 40):
-        return Period.MORNING_2
-    elif dt.time(14, 0) <= time <= dt.time(15, 40):
-        return Period.AFTERNOON_1
-    elif dt.time(16, 0) <= time <= dt.time(17, 40):
-        return Period.AFTERNOON_2
-    return None
+    return timeslots
 
 
 def _get_teacher_id(teacher_email: str) -> str:
@@ -115,25 +96,18 @@ def _get_fixed_classes(fixed_classes_input: str) -> set[ScheduleTimeslot]:
         FIXED_CLASS_REGEX, fixed_classes_input
     ):
         weekday = Weekday(int(weekday) - 2)
-        periods: set[Period] = set()
 
         start_time = dt.datetime.strptime(start_time, "%H:%M")
-        start_period = _time_to_period(start_time.time())
-        if start_period is not None:
-            periods.add(start_period)
-
         if end_time:
             end_time = end_time[1:]  # remove '-' prefix
             end_time = dt.datetime.strptime(end_time, "%H:%M")
         else:
             end_time = start_time + dt.timedelta(hours=1, minutes=40)
 
-        end_period = _time_to_period(end_time.time())
-        if end_period is not None:
-            periods.add(end_period)
-
+        periods = Period.intersections(start_time.time(), end_time.time())
         for period in periods:
             fixed_classes.add(ScheduleTimeslot(weekday, period))
+
     return fixed_classes
 
 
