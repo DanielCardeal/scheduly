@@ -85,7 +85,7 @@ def load_preset(
         raise ConfigurationException(
             f"TOML syntax error in preset file {preset_path}:\n{e}"
         )
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         raise ConfigurationException(f"Unable to find preset file {preset_path}.")
     except cattrs.ClassValidationError as e:
         # Capture the first error and raise it as a ConfigurationException

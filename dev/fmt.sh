@@ -10,3 +10,7 @@ echo '+ black (end)'
 echo '+ isort (start)'
 poetry run isort .
 echo '+ isort (end)'
+
+echo '+ ruff (start)'
+poetry run ruff check --fix .
+echo '+ ruff (end)'

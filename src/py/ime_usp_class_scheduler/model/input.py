@@ -4,10 +4,10 @@ import csv
 import datetime as dt
 import re
 from contextlib import ExitStack
-from typing import IO, Hashable, Iterable, Optional, Protocol, Sequence, TypeVar
+from typing import IO, Hashable, Protocol, Sequence, TypeVar
 
 import cattrs
-from attrs import asdict, define, field, frozen, validators
+from attrs import define, field, frozen, validators
 from clingo.symbol import Function, Number, String, Symbol
 from typing_extensions import Self
 

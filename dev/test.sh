@@ -15,6 +15,10 @@ echo "+ isort (start)"
 poetry run isort --check .
 echo "- isort (end)"
 
+echo '+ ruff (start)'
+poetry run ruff check .
+echo '+ ruff (end)'
+
 echo "+ mypy (start)"
 poetry run mypy .
 echo "+ mypy (end)"
