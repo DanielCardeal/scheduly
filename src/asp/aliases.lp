@@ -29,7 +29,7 @@ def is_obligatory/1(course id)
 is_obligatory(Course) :- curriculum_component("obligatory", Course, _).
 
 %*
-def lecturer/1(teacher id)
+def teacher/1(teacher id)
 *%
 teacher(Teacher) :- lecturer(_, _, Teacher).
 
