@@ -5,6 +5,7 @@ from ime_usp_class_scheduler.constants import CONSTRAINTS_DIR
 
 
 def test_syntax() -> None:
+    """Test if there are syntatic errors in the ASP files."""
     ctl = Control()
     for path in CONSTRAINTS_DIR.glob("**/*.lp"):
         try:
