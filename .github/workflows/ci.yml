@@ -2,6 +2,12 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
+    paths:
+      - "src/py/"
+      - "src/asp/"
+      - "tests/"
   pull_request:
 
 jobs:
@@ -10,41 +16,21 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.10", "3.11"]
+        python-version: ["3.10", "3.11", "3.12"]
+
+    name: Python ${{matrix.python-version}}
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+
+      - name: Bootstrap python ${{ matrix.python-version }}
+        uses: ./.github/actions/bootstrap
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
-
-      - name: Setup local virtual environment
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry config virtualenvs.in-project true --local
-
-      - name: Prepare dependencies cache
-        uses: actions/cache@v3
-        with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
-
       - name: Install dependencies
-        run: poetry install
+        run: python -m poetry install
 
-      - name: Check formatting with black
-        run: poetry run black --check .
-
-      - name: Check imports with isort
-        run: poetry run isort --check .
-
-      - name: Check types with mypy
-        run: poetry run mypy .
-
-      - name: Run pytest tests
-        run: poetry run pytest --doctest-modules -v
+      - name: Run tests (formatting & unit tests)
+        run: ./dev/test.sh
 
