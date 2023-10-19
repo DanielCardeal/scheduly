@@ -8,13 +8,12 @@ from rich.box import ROUNDED
 from rich.table import Table
 
 from ime_usp_class_scheduler.log import CONSOLE
-from ime_usp_class_scheduler.model import (
+from ime_usp_class_scheduler.model.common import Period, Weekday
+from ime_usp_class_scheduler.model.output import (
     ClassData,
     ConflictData,
     JointedData,
     ModelResult,
-    Period,
-    Weekday,
 )
 
 

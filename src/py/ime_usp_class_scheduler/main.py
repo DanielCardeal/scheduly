@@ -7,6 +7,7 @@ import click
 from ime_usp_class_scheduler.configuration import ConfigurationException, load_preset
 from ime_usp_class_scheduler.constants import HARD_CONSTRAINTS_DIR, SOFT_CONSTRAINTS_DIR
 from ime_usp_class_scheduler.log import LOG_ERROR, LOG_EXCEPTION, LOG_INFO, LOG_WARN
+from ime_usp_class_scheduler.model.input import ParserException
 from ime_usp_class_scheduler.program import CliProgram
 from ime_usp_class_scheduler.prompt import Confirm, Prompt, PromptNonEmpty
 
@@ -73,22 +74,23 @@ def cli(
             preset, num_schedules=num_schedules, time_limit=time_limit, threads=threads
         )
         program = CliProgram(configuration, dump_symbols=dump_symbols)
+    except (ConfigurationException, ParserException) as e:
+        LOG_EXCEPTION(e)
+        exit(1)
+
+    try:
         if output_model is not None:
             if not output_model.exists() or Confirm.ask(
                 f"{output_model} file already exists, overwrite?"
             ):
-                program.save_model(output_model)
+                program.save_program(output_model)
                 LOG_INFO(f"Starting model saved to {output_model}")
             else:
                 LOG_WARN("Aborted saving model to disk")
-
-        program.start()
-    except ConfigurationException as e:
-        LOG_EXCEPTION(e)
-        exit(1)
     except (FileNotFoundError, OSError, PermissionError) as e:
-        LOG_ERROR(f"Unable to save model to '{e.filename}': {e.__class__.__name__}")
-        exit(1)
+        LOG_WARN(f"Unable to save model to '{e.filename}': {e.__class__.__name__}")
+
+    program.start()
 
 
 @main.command()

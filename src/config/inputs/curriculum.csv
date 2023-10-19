@@ -1,4 +1,4 @@
-course_id,curriculum_id,is_required
+course_id,curricula_id,is_required
 mac0110,obligatory,True
 mac0105,obligatory,True
 mac0422,obligatory,True

@@ -4,29 +4,9 @@ def period/1(period id)
 period(P) :- period(P, _).
 
 %*
-def num_classes/2(course id, number of weekly classes)
-*%
-num_classes(Course, NumClasses) :- course(Course, _, NumClasses, _, _).
-
-%*
-def ideal_period/2(course id, ideal period)
-*%
-ideal_period(Course, IdealPeriod) :- course(Course, _, _, IdealPeriod, _).
-
-%*
-def is_double/1(course_id)
-*%
-is_double(Course) :- course(Course, _, _, _, 1).
-
-%*
-def is_undergrad/1(course_id)
-*%
-is_undergrad(Course) :- course(Course, "grad", _, _, _).
-
-%*
 def is_obligatory/1(course id)
 *%
-is_obligatory(Course) :- curriculum_component("obligatory", Course, _).
+is_obligatory(Course) :- curriculum("obligatory", Course, _).
 
 %*
 def teacher/1(teacher id)
@@ -70,11 +50,6 @@ availability(Teacher, N) :-
     N = #count { W, P: available(Teacher, W, P) }.
 
 #show period/1.
-#show num_classes/2.
-#show ideal_period/2.
-#show is_double/1.
-#show is_undergrad/1.
-#show is_obligatory/1.
 #show teacher/1.
 #show conflict/4.
 #show _conflict/6.

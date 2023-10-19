@@ -37,9 +37,24 @@ This page lists and explains all of the predicates and values used within the pr
 
 ### Courses' information
 
-+ `course/5(course id, course group, number of weekly classes, ideal period, is double)`
 
-  General information about a course in the educational institution.  
++ `num_classes/2(course id, number of weekly classes)`
+
+  Number of classes of a course.
+
++ `is_double/1(course id)`
+  
+  Identifies courses with double classes, aka, courses with classes that occupy
+  two consecutive periods in the same day.
+
++ `is_undergrad/1(course id)`
+  
+  Identifies undergrad courses.
+
++ `is_obligatory(course id)`
+
+  General information about a course in the educational institution. An ideal
+  period of 0 is equivalent to no ideal period.
 
 + `joint/2(course A id, course B id)`
 
@@ -48,13 +63,9 @@ This page lists and explains all of the predicates and values used within the pr
 
 ### Curricula information
 
-+ `curriculum/2(curriculum id, curriculum group)`
++ `curriculum/3(curriculum id, course id, is required)`
 
-  Represents a curriculum in the institution. 
-
-+ `curriculum_component/3(curriculum id, course id, is required)`
-
-  Assign a `course` as part of a `curriculum`. The component can be optionally
+  Assign a `course` as part of a `curriculum`. The course can be optionally
   marked as 'required', indicating that a student must take this course to
   complete the curriculum.
 
@@ -102,10 +113,6 @@ This predicates don't add information about the model, but they facilitate
 writing rules in a more concise manner. 
 
 + `period/1(period id)`
-+ `num_classes/2(course id, number of weekly classes)`
-+ `is_double/1(course id)`
-+ `is_undergrad/1(course id)`
-+ `is_obligatory(course id)`
 
 + `teacher/1(teacher id)`
 
