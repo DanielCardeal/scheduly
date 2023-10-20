@@ -518,7 +518,7 @@ class InputDataset:
             self.curriculums,
         )
         result = "\n".join(el.into_asp() for param in instance_params for el in param)
-        return result
+        return result + "\n"
 
     def validate_and_normalize(self) -> None:
         """Check the consistency of the dataset, fixing inconsistencies whenever
@@ -561,6 +561,8 @@ class InputDataset:
                     LOG_WARN(
                         f"No availability for teacher '{teacher_id}', using full availability."
                     )
+                    teacher = TeacherScheduleData(teacher_id)
+                    self.schedules.append(teacher)
 
     @classmethod
     def from_default_files(cls) -> Self:

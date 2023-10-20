@@ -6,8 +6,13 @@ from typing import Optional
 import cattrs
 import tomli
 from attr import Factory, define
+from attrs import field, validators
 
-from ime_usp_class_scheduler.constants import PRESETS_DIR
+from ime_usp_class_scheduler.constants import (
+    HARD_CONSTRAINTS_DIR,
+    PRESETS_DIR,
+    SOFT_CONSTRAINTS_DIR,
+)
 from ime_usp_class_scheduler.log import LOG_INFO, LOG_WARN
 
 
@@ -20,7 +25,7 @@ class Configuration:
     """Represents the user configuration of the scheduler program"""
 
     clingo: ClingoOptions
-    constraints: ConstraintsConfiguration
+    constraints: ConstraintSpecification
 
 
 @define
@@ -33,35 +38,87 @@ class ClingoOptions:
 
 
 @define
-class ConstraintsConfiguration:
+class ConstraintSpecification:
     """Configurations related to constraints of the scheduler"""
 
-    hard: list[HardConstraintsConfiguration] = Factory(list)
-    soft: list[SoftConstraintsConfiguration] = Factory(list)
+    hard: list[HardConstraintsSpecification] = Factory(list)
+    soft: list[SoftConstraintsSpecification] = Factory(list)
+
+    def into_asp(self) -> str:
+        """Loads the specification's constraints into a string."""
+        code = "\n".join(constraint.into_asp() for constraint in self.hard + self.soft)
+        return code + "\n"
 
 
 @define
-class HardConstraintsConfiguration:
+class HardConstraintsSpecification:
     """User configuration of hard constraints."""
 
-    name: str
+    name: str = field(validator=validators.min_len(1))
 
     @property
     def path(self) -> Path:
-        return Path(self.name).with_suffix(".lp")
+        return HARD_CONSTRAINTS_DIR.joinpath(self.name).with_suffix(".lp")
+
+    def into_asp(self) -> str:
+        """Load hard constraint into a string.
+
+        Raises an ConfigurationException if it is not possible to load the file
+        contents.
+        """
+        code = ""
+        try:
+            with open(self.path) as f:
+                code += f.read()
+        except OSError as e:
+            raise ConfigurationException(
+                f"Unable to load '{self.name}' hard constraint: {e}"
+            )
+        return code
 
 
 @define
-class SoftConstraintsConfiguration:
+class SoftConstraintsSpecification:
     """User configuration of soft constraints."""
 
-    name: str
-    weight: int
+    name: str = field(validator=validators.min_len(1))
+
+    weight: int = field()
+
+    @weight.validator
+    def _weight_validator(self, _: str, weight: int) -> None:
+        if weight == 0:
+            # NOTE: TIP: if you want to disable a soft constraint, just comment
+            # it out of in the preset file.
+            raise ConfigurationException("Weight must be different from 0.")
+
     priority: int
 
     @property
     def path(self) -> Path:
-        return Path(self.name).with_suffix(".lp")
+        return SOFT_CONSTRAINTS_DIR.joinpath(self.name).with_suffix(".lp")
+
+    def into_asp(self) -> str:
+        """Load soft constraint into a string, setting its weight and priority
+        as ASP constants.
+
+        Raises a ConfigurationException if it is not possible to load the file
+        contents.
+        """
+        code = ""
+        try:
+            with open(self.path) as f:
+                code += f.read()
+        except OSError as e:
+            raise ConfigurationException(
+                f"Unable to load '{self.name}' soft constraint: {e}"
+            )
+
+        weight = f"#const w_{self.name} = {self.weight}.\n"
+        priority = f"#const p_{self.name} = {self.priority}.\n"
+        code += weight + priority
+
+        return code
 
 
 def load_preset(

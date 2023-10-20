@@ -7,11 +7,6 @@ from clingo import Model, SolveResult
 from rich.json import JSON
 
 from ime_usp_class_scheduler.configuration import Configuration
-from ime_usp_class_scheduler.constants import (
-    CONSTRAINTS_DIR,
-    HARD_CONSTRAINTS_DIR,
-    SOFT_CONSTRAINTS_DIR,
-)
 from ime_usp_class_scheduler.log import CONSOLE, LOG_INFO, LOG_WARN
 from ime_usp_class_scheduler.model.input import InputDataset
 from ime_usp_class_scheduler.model.output import ModelResult
@@ -47,27 +42,17 @@ class Program(ABC):
 class CliProgram(Program):
     """A commandline interface solver program."""
 
-    _BASE_MODEL_PATHS = [
-        CONSTRAINTS_DIR.joinpath(path).with_suffix(".lp")
-        for path in ("aliases", "base")
-    ]
-
     def __init__(self, configuration: Configuration, dump_symbols: bool) -> None:
-        self._solver = CliSolver(configuration)
+        self._solver = CliSolver(
+            options=configuration.clingo,
+            inputs=InputDataset.from_default_files(),
+            constraints=configuration.constraints,
+        )
         self._model_viewer = CliTabularView()
         self._best_models: deque[ModelResult] = deque(
             maxlen=configuration.clingo.num_models
         )
-        self._hard_constraints = configuration.constraints.hard
-        self._soft_constraints = configuration.constraints.soft
         self._dump_symbols = dump_symbols
-
-        input_dataset = self._load_inputs()
-        input_dataset.validate_and_normalize()
-        self._solver.load_input(input_dataset)
-
-        model = self._load_model()
-        self._solver.load_model(model)
 
     def start(self) -> None:
         """Starts the program."""
@@ -95,37 +80,3 @@ class CliProgram(Program):
 
         if self._dump_symbols:
             rich.print(JSON.from_data(self._model_viewer.symbols))
-
-    def _load_inputs(self) -> InputDataset:
-        """Loads and validates the scheduler inputs."""
-        return InputDataset.from_default_files()
-
-    def _load_model(self) -> str:
-        """Load the ASP model (base + hard and soft constraints) based on user configuration."""
-        model = ""
-
-        # Load constraints
-        paths = self._BASE_MODEL_PATHS.copy()
-        paths += [
-            HARD_CONSTRAINTS_DIR.joinpath(constraint_cfg.path)
-            for constraint_cfg in self._hard_constraints
-        ]
-        paths += [
-            SOFT_CONSTRAINTS_DIR.joinpath(constraint_cfg.path)
-            for constraint_cfg in self._soft_constraints
-        ]
-
-        try:
-            for path in paths:
-                with open(path) as f:
-                    model += f.read() + "\n"
-        except FileNotFoundError as e:
-            raise FileNotFoundError(f"Unable to find constraint file {e.filename}.")
-
-        # Setup weights and and priorities
-        for soft_cfg in self._soft_constraints:
-            weight = f"#const w_{soft_cfg.name} = {soft_cfg.weight}.\n"
-            priority = f"#const p_{soft_cfg.name} = {soft_cfg.priority}.\n"
-            model += weight + priority
-
-        return model
