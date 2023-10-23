@@ -6,8 +6,8 @@ import rich
 from clingo import Model, SolveResult
 from rich.json import JSON
 
-from ime_usp_class_scheduler.configuration import Configuration
 from ime_usp_class_scheduler.log import CONSOLE, LOG_INFO, LOG_WARN
+from ime_usp_class_scheduler.model.configuration import Configuration
 from ime_usp_class_scheduler.model.input import InputDataset
 from ime_usp_class_scheduler.model.output import ModelResult
 from ime_usp_class_scheduler.solver import CliSolver, Solver

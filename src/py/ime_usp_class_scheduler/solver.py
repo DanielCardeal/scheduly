@@ -3,13 +3,13 @@ from typing import Callable, Optional
 
 from clingo import Control, Model, SolveResult
 
-from ime_usp_class_scheduler.configuration import (
-    ClingoOptions,
-    ConfigurationException,
-    ConstraintSpecification,
-)
 from ime_usp_class_scheduler.constants import CONSTRAINTS_DIR
 from ime_usp_class_scheduler.log import LOG_WARN
+from ime_usp_class_scheduler.model.configuration import (
+    ClingoOptions,
+    ConstraintSpecification,
+    PresetConfigException,
+)
 from ime_usp_class_scheduler.model.input import InputDataset
 
 
@@ -38,7 +38,7 @@ class Solver(ABC):
                 with open(path) as base_file:
                     base += base_file.read() + "\n"
             except IOError as e:
-                raise ConfigurationException(
+                raise PresetConfigException(
                     f"Unable to load base model file '{filename}' from {path}: {e}"
                 )
         self._base = base

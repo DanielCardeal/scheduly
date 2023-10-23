@@ -13,13 +13,10 @@ from typing_extensions import Self
 
 from ime_usp_class_scheduler.constants import INPUT_DIR
 from ime_usp_class_scheduler.log import LOG_WARN
-from ime_usp_class_scheduler.model.common import Period, Weekday
+from ime_usp_class_scheduler.model.common import CONVERTER, Period, Weekday
 
 DEFAULT_PERIOD_LENGTH = dt.timedelta(hours=1, minutes=40)
 """The default length of a period in the educational institution"""
-
-CONVERTER = cattrs.Converter(prefer_attrib_converters=True)
-"""The default converter used while parsing."""
 
 
 class ParserException(Exception):

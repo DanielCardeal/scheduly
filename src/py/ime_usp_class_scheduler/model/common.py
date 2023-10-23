@@ -3,6 +3,11 @@ from __future__ import annotations
 import datetime as dt
 from enum import IntEnum
 
+from cattrs import Converter
+
+CONVERTER = Converter(prefer_attrib_converters=True)
+"""The default converter used while parsing."""
+
 
 class Weekday(IntEnum):
     """Days of the week as they are represented inside scheduler."""

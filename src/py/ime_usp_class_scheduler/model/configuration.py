@@ -1,3 +1,4 @@
+"""Dataclasses that represent the clingo solver configuration."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -13,11 +14,11 @@ from ime_usp_class_scheduler.constants import (
     SOFT_CONSTRAINTS_DIR,
 )
 from ime_usp_class_scheduler.log import LOG_INFO, LOG_WARN, extract_cattrs_error
-from ime_usp_class_scheduler.model.input import CONVERTER
+from ime_usp_class_scheduler.model.common import CONVERTER
 
 
-class ConfigurationException(Exception):
-    """Raised when a configuration error is found"""
+class PresetConfigException(Exception):
+    """Raised when an error is found while loading a preset file."""
 
 
 @define
@@ -80,7 +81,7 @@ class HardConstraintsSpecification:
     def into_asp(self) -> str:
         """Load hard constraint into a string.
 
-        Raises an ConfigurationException if it is not possible to load the file
+        Raises an PresetConfigException if it is not possible to load the file
         contents.
         """
         code = ""
@@ -88,7 +89,7 @@ class HardConstraintsSpecification:
             with open(self.path) as f:
                 code += f.read()
         except OSError as e:
-            raise ConfigurationException(
+            raise PresetConfigException(
                 f"Unable to load '{self.name}' hard constraint: {e}"
             )
         return code
@@ -134,7 +135,7 @@ class SoftConstraintsSpecification:
         """Load soft constraint into a string, setting its weight and priority
         as ASP constants.
 
-        Raises a ConfigurationException if it is not possible to load the file
+        Raises a PresetConfigException if it is not possible to load the file
         contents.
         """
         code = ""
@@ -142,7 +143,7 @@ class SoftConstraintsSpecification:
             with open(self.path) as f:
                 code += f.read()
         except OSError as e:
-            raise ConfigurationException(
+            raise PresetConfigException(
                 f"Unable to load '{self.name}' soft constraint: {e}"
             )
 
@@ -170,17 +171,17 @@ def load_preset(
         with open(preset_path, "rb") as f:
             configuration_dict = tomli.load(f)
     except tomli.TOMLDecodeError as e:
-        raise ConfigurationException(
+        raise PresetConfigException(
             f"TOML syntax error in preset file {preset_path}:\n{e}"
         )
     except FileNotFoundError:
-        raise ConfigurationException(f"Unable to find preset file {preset_path}.")
+        raise PresetConfigException(f"Unable to find preset file {preset_path}.")
 
     try:
         configuration = CONVERTER.structure(configuration_dict, Configuration)
     except BaseValidationError as e:
         messages = "\n".join(f"* {msg}" for msg in extract_cattrs_error(e))
-        raise ConfigurationException(
+        raise PresetConfigException(
             f"Some errors were found while parsing the '{preset}' preset file:\n{messages}"
         )
 
