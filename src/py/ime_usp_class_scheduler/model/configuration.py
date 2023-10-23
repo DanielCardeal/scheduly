@@ -8,13 +8,13 @@ import tomli
 from attrs import Factory, define, field, validators
 from cattrs import BaseValidationError
 
-from ime_usp_class_scheduler.constants import (
+from ime_usp_class_scheduler.log import LOG_INFO, LOG_WARN, extract_cattrs_error
+from ime_usp_class_scheduler.model.common import CONVERTER
+from ime_usp_class_scheduler.paths import (
     HARD_CONSTRAINTS_DIR,
     PRESETS_DIR,
     SOFT_CONSTRAINTS_DIR,
 )
-from ime_usp_class_scheduler.log import LOG_INFO, LOG_WARN, extract_cattrs_error
-from ime_usp_class_scheduler.model.common import CONVERTER
 
 
 class PresetConfigException(Exception):

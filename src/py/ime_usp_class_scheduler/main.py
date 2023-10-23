@@ -4,13 +4,13 @@ from typing import Optional
 
 import click
 
-from ime_usp_class_scheduler.constants import HARD_CONSTRAINTS_DIR, SOFT_CONSTRAINTS_DIR
 from ime_usp_class_scheduler.log import LOG_ERROR, LOG_EXCEPTION, LOG_INFO, LOG_WARN
 from ime_usp_class_scheduler.model.configuration import (
     PresetConfigException,
     load_preset,
 )
 from ime_usp_class_scheduler.model.input import ParserException
+from ime_usp_class_scheduler.paths import HARD_CONSTRAINTS_DIR, SOFT_CONSTRAINTS_DIR
 from ime_usp_class_scheduler.program import CliProgram
 from ime_usp_class_scheduler.prompt import Confirm, Prompt, PromptNonEmpty
 

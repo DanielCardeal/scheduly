@@ -1,7 +1,7 @@
 from clingo import Control
 from pytest import fail
 
-from ime_usp_class_scheduler.constants import CONSTRAINTS_DIR
+from ime_usp_class_scheduler.paths import CONSTRAINTS_DIR
 
 
 def test_syntax() -> None:

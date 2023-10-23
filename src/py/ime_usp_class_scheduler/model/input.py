@@ -12,9 +12,9 @@ from attrs import define, field, frozen, validators
 from clingo.symbol import Function, Number, String, Symbol
 from typing_extensions import Self
 
-from ime_usp_class_scheduler.constants import INPUT_DIR
 from ime_usp_class_scheduler.log import LOG_WARN
 from ime_usp_class_scheduler.model.common import CONVERTER, Period, Weekday
+from ime_usp_class_scheduler.paths import INPUT_DIR
 
 DEFAULT_PERIOD_LENGTH = dt.timedelta(hours=1, minutes=40)
 """The default length of a period in the educational institution"""

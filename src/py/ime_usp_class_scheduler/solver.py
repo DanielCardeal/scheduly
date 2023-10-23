@@ -3,7 +3,6 @@ from typing import Callable, Optional
 
 from clingo import Control, Model, SolveResult
 
-from ime_usp_class_scheduler.constants import CONSTRAINTS_DIR
 from ime_usp_class_scheduler.log import LOG_WARN
 from ime_usp_class_scheduler.model.configuration import (
     ClingoOptions,
@@ -11,6 +10,7 @@ from ime_usp_class_scheduler.model.configuration import (
     PresetConfigException,
 )
 from ime_usp_class_scheduler.model.input import InputDataset
+from ime_usp_class_scheduler.paths import CONSTRAINTS_DIR
 
 
 class Solver(ABC):
