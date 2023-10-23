@@ -500,16 +500,16 @@ class InputDataset:
 
     courses: list[CourseData]
     schedules: list[TeacherScheduleData]
-    workloads: list[WorkloadData]
-    curriculums: list[CurriculumData]
+    workload: list[WorkloadData]
+    curriculum: list[CurriculumData]
 
     def into_str(self) -> str:
         """Converts an InputDataset into an ASP code string."""
         instance_params: Sequence[Sequence[AspInput]] = (
             self.courses,
             self.schedules,
-            self.workloads,
-            self.curriculums,
+            self.workload,
+            self.curriculum,
         )
         result = "\n".join(el.into_asp() for param in instance_params for el in param)
         return result + "\n"
@@ -525,8 +525,8 @@ class InputDataset:
         named_params: Sequence[tuple[str, Sequence[AspInput]]] = [
             ("courses", self.courses),
             ("schedules", self.schedules),
-            ("workloads", self.workloads),
-            ("curriculums", self.curriculums),
+            ("workload", self.workload),
+            ("curriculum", self.curriculum),
         ]
         for input_type, value_list in named_params:
             seen: dict[Hashable | tuple[Hashable, ...], int] = {}
@@ -541,7 +541,7 @@ class InputDataset:
                     f"Found the following repeated values while parsing {input_type}:\n{repeated}"
                 )
 
-        for workload in self.workloads:
+        for workload in self.workload:
             # Check if data of a course to be scheduled is missing
             for course_id in workload.courses_id:
                 if not [c for c in self.courses if c.course_id == course_id]:
@@ -561,25 +561,24 @@ class InputDataset:
     @classmethod
     def from_default_files(cls) -> Self:
         """Creates an InputDataset from the default input files (placed at INPUT_DIR)."""
-        try:
-            with ExitStack() as stack:
 
-                def open_input(basename: str) -> IO[str]:
-                    path = INPUT_DIR.joinpath(basename).with_suffix(".csv")
-                    return stack.enter_context(open(path, "rU"))
+        def get_path(basename: str) -> Path:
+            return INPUT_DIR.joinpath(basename).with_suffix(".csv")
 
-                courses_file = open_input("courses")
-                schedules_file = open_input("schedules")
-                workloads_file = open_input("workloads")
-                curriculum_file = open_input("curriculum")
+        parsed_data: dict[str, Sequence[AspInput]] = {}
+        for basename, schema in [
+            ("courses", CourseData),
+            ("schedules", TeacherScheduleData),
+            ("workload", WorkloadData),
+            ("curriculum", CurriculumData),
+        ]:
+            input_path = get_path(basename)
+            try:
+                with open(input_path) as csv_data:
+                    parsed_data[basename] = _csv_to_schema(csv_data, schema)
+            except OSError as e:
+                raise FileTreeError.from_os_error(basename, "input file", e)
+            except BaseValidationError as e:
+                raise ParsingError.from_cattrs_error(basename, "input file", e)
 
-                courses = _csv_to_schema(courses_file, CourseData)
-                schedules = _csv_to_schema(schedules_file, TeacherScheduleData)
-                workloads = _csv_to_schema(workloads_file, WorkloadData)
-                curriculum = _csv_to_schema(curriculum_file, CurriculumData)
-
-            return cls(courses, schedules, workloads, curriculum)
-        except (FileNotFoundError, PermissionError, OSError) as e:
-            raise ParserException(
-                f"Unable to load input file {e.filename}: {e.__class__.__name__}"
-            )
+        return cls(**parsed_data)  # type: ignore
