@@ -44,13 +44,13 @@ class CliProgram(Program):
 
     def __init__(self, configuration: Configuration, dump_symbols: bool) -> None:
         self._solver = CliSolver(
-            options=configuration.clingo,
+            configuration.options,
             inputs=InputDataset.from_default_files(),
             constraints=configuration.constraints,
         )
         self._model_viewer = CliTabularView()
         self._best_models: deque[ModelResult] = deque(
-            maxlen=configuration.clingo.num_models
+            maxlen=configuration.options.num_models
         )
         self._dump_symbols = dump_symbols
 

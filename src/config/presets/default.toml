@@ -1,4 +1,4 @@
-[clingo]
+[options]
 num_models = 1
 time_limit = 60
 threads = 4

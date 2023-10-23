@@ -3,17 +3,17 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional
 
-import cattrs
 import tomli
-from attr import Factory, define
-from attrs import field, validators
+from attrs import Factory, define, field, validators
+from cattrs import BaseValidationError
 
 from ime_usp_class_scheduler.constants import (
     HARD_CONSTRAINTS_DIR,
     PRESETS_DIR,
     SOFT_CONSTRAINTS_DIR,
 )
-from ime_usp_class_scheduler.log import LOG_INFO, LOG_WARN
+from ime_usp_class_scheduler.log import LOG_INFO, LOG_WARN, extract_cattrs_error
+from ime_usp_class_scheduler.model.input import CONVERTER
 
 
 class ConfigurationException(Exception):
@@ -24,17 +24,25 @@ class ConfigurationException(Exception):
 class Configuration:
     """Represents the user configuration of the scheduler program"""
 
-    clingo: ClingoOptions
+    options: ClingoOptions
+    """Options for the underlying clingo solver."""
+
     constraints: ConstraintSpecification
+    """Constraints specification for the solver."""
 
 
 @define
 class ClingoOptions:
     """Configuration options for the underlying clingo solver"""
 
-    num_models: int = 1
-    time_limit: int = 30
-    threads: int = 1
+    threads: int = field(validator=validators.gt(0))
+    """Number of clingo solving threads to use."""
+
+    num_models: int = field(validator=validators.ge(1))
+    """Number of schedules to create."""
+
+    time_limit: int = field(validator=validators.gt(0))
+    """Time limit (in seconds) to search for solutions."""
 
 
 @define
@@ -42,7 +50,10 @@ class ConstraintSpecification:
     """Configurations related to constraints of the scheduler"""
 
     hard: list[HardConstraintsSpecification] = Factory(list)
+    """List of hard constraints to add to the model."""
+
     soft: list[SoftConstraintsSpecification] = Factory(list)
+    """List of soft constraints to add to the model."""
 
     def into_asp(self) -> str:
         """Loads the specification's constraints into a string."""
@@ -55,9 +66,15 @@ class HardConstraintsSpecification:
     """User configuration of hard constraints."""
 
     name: str = field(validator=validators.min_len(1))
+    """Name of the hard constraint.
+
+    Must be the same as the filename (without extension) of the file that
+    contains the hard constraint code in the `HARD_CONSTRAINTS_DIR`.
+    """
 
     @property
     def path(self) -> Path:
+        """Path of the hard constraint file."""
         return HARD_CONSTRAINTS_DIR.joinpath(self.name).with_suffix(".lp")
 
     def into_asp(self) -> str:
@@ -82,20 +99,35 @@ class SoftConstraintsSpecification:
     """User configuration of soft constraints."""
 
     name: str = field(validator=validators.min_len(1))
+    """Name of the soft constraint.
+
+    Must be the same as the filename (without extension) of the file that
+    contains the soft constraint code in the `SOFT_CONSTRAINTS_DIR`.
+    """
 
     weight: int = field()
+    """Weight (or cost) of the soft constraint.
+
+    The higher the weight, the worst it is to violate the soft constraint.
+    """
 
     @weight.validator
     def _weight_validator(self, _: str, weight: int) -> None:
         if weight == 0:
             # NOTE: TIP: if you want to disable a soft constraint, just comment
             # it out of in the preset file.
-            raise ConfigurationException("Weight must be different from 0.")
+            raise ValueError("soft constraint weights must be different than 0.")
 
     priority: int
+    """Priority (or optimization layer) of the soft constraint.
+
+    Soft constraints with higher priority will be optimized before those with
+    lower priority.
+    """
 
     @property
     def path(self) -> Path:
+        """Path of the soft constraint file."""
         return SOFT_CONSTRAINTS_DIR.joinpath(self.name).with_suffix(".lp")
 
     def into_asp(self) -> str:
@@ -137,32 +169,34 @@ def load_preset(
     try:
         with open(preset_path, "rb") as f:
             configuration_dict = tomli.load(f)
-        configuration = cattrs.structure(configuration_dict, Configuration)
     except tomli.TOMLDecodeError as e:
         raise ConfigurationException(
             f"TOML syntax error in preset file {preset_path}:\n{e}"
         )
     except FileNotFoundError:
         raise ConfigurationException(f"Unable to find preset file {preset_path}.")
-    except cattrs.ClassValidationError as e:
-        # Capture the first error and raise it as a ConfigurationException
-        message = cattrs.transform_error(e)[0]
-        raise ConfigurationException(f"Malformed preset file {preset_path}: {message}")
 
+    try:
+        configuration = CONVERTER.structure(configuration_dict, Configuration)
+    except BaseValidationError as e:
+        messages = "\n".join(f"* {msg}" for msg in extract_cattrs_error(e))
+        raise ConfigurationException(
+            f"Some errors were found while parsing the '{preset}' preset file:\n{messages}"
+        )
+
+    # Overwrite values
     if num_schedules is not None:
-        configuration.clingo.num_models = num_schedules
+        configuration.options.num_models = num_schedules
     if time_limit is not None:
-        configuration.clingo.time_limit = time_limit
+        configuration.options.time_limit = time_limit
     if threads is not None:
-        configuration.clingo.threads = threads
+        configuration.options.threads = threads
 
-    LOG_INFO("Number of models:", configuration.clingo.num_models)
-    LOG_INFO("Time limit (s):", configuration.clingo.time_limit)
-    if configuration.clingo.threads <= 0:
-        raise ConfigurationException("Number of solving threads must be >= 1.")
-    elif configuration.clingo.threads == 1:
+    LOG_INFO("Number of models:", configuration.options.num_models)
+    LOG_INFO("Time limit (s):", configuration.options.time_limit)
+    if configuration.options.threads == 1:
         LOG_WARN("Using only one solving thread, performance might be low.")
     else:
-        LOG_INFO("Number of threads:", configuration.clingo.threads)
+        LOG_INFO("Number of threads:", configuration.options.threads)
 
     return configuration

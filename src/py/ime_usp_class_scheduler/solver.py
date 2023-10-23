@@ -20,14 +20,12 @@ class Solver(ABC):
 
     def __init__(
         self,
+        options: ClingoOptions,
         /,
-        options: Optional[ClingoOptions] = None,
         inputs: Optional[InputDataset] = None,
         constraints: Optional[ConstraintSpecification] = None,
     ) -> None:
         """Initialize and configure the underlying solver."""
-        if options is None:
-            options = ClingoOptions()
         self.options = options
         self.inputs = inputs
         self.constraints = constraints
