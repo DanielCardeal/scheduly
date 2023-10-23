@@ -3,13 +3,15 @@ from textwrap import dedent
 from typing import TypeVar
 
 import pytest
+from cattrs.errors import BaseValidationError
 
+from ime_usp_class_scheduler.errors import InconsistentInputError
 from ime_usp_class_scheduler.model.common import Period, Weekday
 from ime_usp_class_scheduler.model.input import (
     AspInput,
     CourseData,
     CurriculumData,
-    ParserException,
+    InputDataset,
     ScheduleTimeslot,
     TeacherScheduleData,
     WorkloadData,
@@ -216,8 +218,94 @@ class TestParsers:
         """Tests if exceptions are properly raised when a malformed CSV is given."""
         test_input = dedent(test_input)
         csv_data = StringIO(test_input)
-        with pytest.raises(ParserException):
+        with pytest.raises(BaseValidationError):
             _csv_to_schema(csv_data, schema)
+
+
+class TestInputDataset:
+    def test_index_validation(self) -> None:
+        """Test if `validate_and_normalize` function for correctly finds repeated
+        values by their index.
+        """
+        bad_courses = [
+            CourseData(
+                course_id="mac111",
+                num_classes=2,
+                ideal_semester=1,
+                is_double=False,
+            ),
+            CourseData(
+                course_id="mac111",
+                num_classes=2,
+                ideal_semester=1,
+                is_double=True,
+            ),
+        ]
+        bad_schedules = [
+            TeacherScheduleData(
+                teacher_id="profAAA",
+                unavailable=set(),
+            ),
+            TeacherScheduleData(
+                teacher_id="profAAA",
+                unavailable={ScheduleTimeslot(Weekday.MONDAY, Period.MORNING_1)},
+            ),
+        ]
+        bad_workload = [
+            WorkloadData(
+                courses_id=["mac111"],
+                teachers_id=["profAAA"],
+                offering_group="",
+            ),
+            WorkloadData(
+                courses_id=["mac111"],
+                teachers_id=["profBBB"],
+                offering_group="POS_BCC",
+            ),  # should not conflict, since is a "multi index"
+            WorkloadData(
+                courses_id=["mac111"],
+                teachers_id=["profAAA"],
+                offering_group="BCC",
+            ),
+        ]
+        bad_curriculum = [
+            CurriculumData(course_id="mac222", curricula_id="ai", is_required=False),
+            CurriculumData(
+                course_id="mac222", curricula_id="sys", is_required=True
+            ),  # should not conflict since it is a "multi index"
+            CurriculumData(course_id="mac222", curricula_id="ai", is_required=True),
+        ]
+
+        good_courses = bad_courses[:1]
+        good_schedules = bad_schedules[:1]
+        good_workload = bad_workload[:2]
+        good_curriculum = bad_curriculum[:2]
+
+        with pytest.raises(InconsistentInputError):
+            # Check repeated courses
+            InputDataset(
+                bad_courses, good_schedules, good_workload, good_curriculum
+            ).validate_and_normalize()
+
+            # Check repeated schedules
+            InputDataset(
+                good_courses, bad_schedules, good_workload, good_curriculum
+            ).validate_and_normalize()
+
+            # Check repeated workload
+            InputDataset(
+                good_courses, good_schedules, bad_workload, good_curriculum
+            ).validate_and_normalize()
+
+            # Check repeated curriculum
+            InputDataset(
+                good_courses, good_schedules, good_workload, bad_curriculum
+            ).validate_and_normalize()
+
+        # no more repeated data, should not raise anything
+        InputDataset(
+            good_courses, good_schedules, good_workload, good_curriculum
+        ).validate_and_normalize()
 
 
 class TestConverters:

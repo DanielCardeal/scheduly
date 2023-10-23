@@ -4,24 +4,25 @@ from __future__ import annotations
 import csv
 import datetime as dt
 import re
-from contextlib import ExitStack
+from pathlib import Path
 from typing import IO, Hashable, Protocol, Sequence, TypeVar
 
-import cattrs
 from attrs import define, field, frozen, validators
+from cattrs.errors import BaseValidationError
 from clingo.symbol import Function, Number, String, Symbol
 from typing_extensions import Self
 
+from ime_usp_class_scheduler.errors import (
+    FileTreeError,
+    InconsistentInputError,
+    ParsingError,
+)
 from ime_usp_class_scheduler.log import LOG_WARN
 from ime_usp_class_scheduler.model.common import CONVERTER, Period, Weekday
 from ime_usp_class_scheduler.paths import INPUT_DIR
 
 DEFAULT_PERIOD_LENGTH = dt.timedelta(hours=1, minutes=40)
 """The default length of a period in the educational institution"""
-
-
-class ParserException(Exception):
-    """Exception raised when an error occurs during the parsing of CSV input files."""
 
 
 def _symbol_to_str(symbols: Symbol | list[Symbol]) -> str:
@@ -243,16 +244,11 @@ def _csv_to_schema(csv_data: IO[str], schema: type[T]) -> list[T]:
     """Loads and validates the CSV using a predefined schema. Data validation is
     defined in the schema itself.
 
-    Raises a ParserException if the CSV data doesn't conform to the schema.
+    Raises a BaseValidationError if cattrs cannot structure the data in the CSV
+    into the schema.
     """
-    try:
-        entries = [data for data in csv.DictReader(csv_data)]
-        return [CONVERTER.structure(entry, schema) for entry in entries]
-    except cattrs.BaseValidationError as e:
-        messages = cattrs.transform_error(e)
-        raise ParserException(
-            f"Unable to parse CSV input into {schema.__name__}: {messages}."
-        )
+    entries = [data for data in csv.DictReader(csv_data)]
+    return [CONVERTER.structure(entry, schema) for entry in entries]
 
 
 @frozen(order=True)
@@ -522,8 +518,8 @@ class InputDataset:
         """Check the consistency of the dataset, fixing inconsistencies whenever
         it is possible.
 
-        If a severe inconsistency is found, raises a ParserException. Light
-        inconsistencies are reported as warnings.
+        If a severe inconsistency is found, raises an InconsistentInputError.
+        Light inconsistencies are reported as warnings.
         """
         # Check if inputs have repeated indexes
         named_params: Sequence[tuple[str, Sequence[AspInput]]] = [
@@ -541,7 +537,7 @@ class InputDataset:
                 seen[idx] += 1
             repeated = {idx for idx, count in seen.items() if count > 1}
             if repeated:
-                raise ParserException(
+                raise InconsistentInputError(
                     f"Found the following repeated values while parsing {input_type}:\n{repeated}"
                 )
 
@@ -549,7 +545,7 @@ class InputDataset:
             # Check if data of a course to be scheduled is missing
             for course_id in workload.courses_id:
                 if not [c for c in self.courses if c.course_id == course_id]:
-                    raise ParserException(
+                    raise InconsistentInputError(
                         f"Missing course information for course with id {course_id}."
                     )
 

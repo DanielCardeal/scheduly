@@ -5,20 +5,17 @@ from pathlib import Path
 from typing import Optional
 
 import tomli
-from attrs import Factory, define, field, validators
+from attrs import define, field, validators
 from cattrs import BaseValidationError
 
-from ime_usp_class_scheduler.log import LOG_INFO, LOG_WARN, extract_cattrs_error
+from ime_usp_class_scheduler.errors import FileTreeError, ParsingError
+from ime_usp_class_scheduler.log import LOG_INFO, LOG_WARN
 from ime_usp_class_scheduler.model.common import CONVERTER
 from ime_usp_class_scheduler.paths import (
     HARD_CONSTRAINTS_DIR,
     PRESETS_DIR,
     SOFT_CONSTRAINTS_DIR,
 )
-
-
-class PresetConfigException(Exception):
-    """Raised when an error is found while loading a preset file."""
 
 
 @define
@@ -50,10 +47,10 @@ class ClingoOptions:
 class ConstraintSpecification:
     """Configurations related to constraints of the scheduler"""
 
-    hard: list[HardConstraintsSpecification] = Factory(list)
+    hard: list[HardConstraintsSpecification]
     """List of hard constraints to add to the model."""
 
-    soft: list[SoftConstraintsSpecification] = Factory(list)
+    soft: list[SoftConstraintsSpecification]
     """List of soft constraints to add to the model."""
 
     def into_asp(self) -> str:
@@ -81,17 +78,14 @@ class HardConstraintsSpecification:
     def into_asp(self) -> str:
         """Load hard constraint into a string.
 
-        Raises an PresetConfigException if it is not possible to load the file
-        contents.
+        Raises an `FileTreeError` if it is not possible to load the file contents.
         """
         code = ""
         try:
             with open(self.path) as f:
                 code += f.read()
         except OSError as e:
-            raise PresetConfigException(
-                f"Unable to load '{self.name}' hard constraint: {e}"
-            )
+            raise FileTreeError.from_os_error(self.name, "hard constraint", e)
         return code
 
 
@@ -135,7 +129,7 @@ class SoftConstraintsSpecification:
         """Load soft constraint into a string, setting its weight and priority
         as ASP constants.
 
-        Raises a PresetConfigException if it is not possible to load the file
+        Raises a `FileTreeError` if it is not possible to load the file
         contents.
         """
         code = ""
@@ -143,9 +137,7 @@ class SoftConstraintsSpecification:
             with open(self.path) as f:
                 code += f.read()
         except OSError as e:
-            raise PresetConfigException(
-                f"Unable to load '{self.name}' soft constraint: {e}"
-            )
+            raise FileTreeError.from_os_error(self.name, "soft constraint", e)
 
         weight = f"#const w_{self.name} = {self.weight}.\n"
         priority = f"#const p_{self.name} = {self.priority}.\n"
@@ -170,20 +162,13 @@ def load_preset(
     try:
         with open(preset_path, "rb") as f:
             configuration_dict = tomli.load(f)
-    except tomli.TOMLDecodeError as e:
-        raise PresetConfigException(
-            f"TOML syntax error in preset file {preset_path}:\n{e}"
-        )
-    except FileNotFoundError:
-        raise PresetConfigException(f"Unable to find preset file {preset_path}.")
-
-    try:
         configuration = CONVERTER.structure(configuration_dict, Configuration)
+    except tomli.TOMLDecodeError as e:
+        raise ParsingError(f"TOML syntax error in preset file {preset_path}:\n{e}")
+    except OSError as e:
+        raise FileTreeError.from_os_error(preset, "preset", e)
     except BaseValidationError as e:
-        messages = "\n".join(f"* {msg}" for msg in extract_cattrs_error(e))
-        raise PresetConfigException(
-            f"Some errors were found while parsing the '{preset}' preset file:\n{messages}"
-        )
+        raise ParsingError.from_cattrs_error(preset, "preset file", e)
 
     # Overwrite values
     if num_schedules is not None:
