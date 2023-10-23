@@ -1,3 +1,4 @@
+"""Dataclasses that model the input data of the scheduler."""
 from __future__ import annotations
 
 import csv

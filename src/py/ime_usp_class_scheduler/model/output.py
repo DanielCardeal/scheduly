@@ -1,3 +1,4 @@
+"""Dataclasses that model results from a scheduler run."""
 from typing import Protocol, Sequence
 
 from attrs import frozen
@@ -7,7 +8,7 @@ from typing_extensions import Self
 from ime_usp_class_scheduler.model.common import Period, Weekday
 
 
-class AspOutput(Protocol):
+class ClingoOutput(Protocol):
     """Objects that can be parsed from an ASP symbol."""
 
     @classmethod
@@ -20,7 +21,10 @@ class JointedData:
     """Information about jointed courses in an ASP model."""
 
     course_id_a: str
+    """First of the conflicting courses."""
+
     course_id_b: str
+    """Second of the conflicting courses."""
 
     @classmethod
     def from_asp(cls, symbol: Symbol) -> Self:
@@ -38,9 +42,16 @@ class ClassData:
     """Information about a scheduled class in a ASP model."""
 
     course_id: str
-    group: str
+    """Unique identifier for the classes' course."""
+
+    offering_group: str
+    """Unique identifier for the classes' offering group."""
+
     weekday: Weekday
+    """Day of the week of the scheduled class."""
+
     period: Period
+    """Period of the scheduled class."""
 
     @classmethod
     def from_asp(cls, symbol: Symbol) -> Self:
@@ -56,14 +67,25 @@ class ClassData:
 
 @frozen
 class ConflictData:
-    """Information about conflicting classes in a ASP model."""
+    """Information about conflicting classes from courses, A and B."""
 
     course_id_a: str
+    """Course A unique identifier."""
+
     group_id_a: str
+    """Course A offering group unique identifier."""
+
     course_id_b: str
+    """Course B unique identifier."""
+
     group_id_b: str
+    """Course B offering group unique identifier."""
+
     weekday: Weekday
+    """Day of the week in which the conflict occurs."""
+
     period: Period
+    """Teaching period in which the conflict occurs."""
 
     @classmethod
     def from_asp(cls, symbol: Symbol) -> Self:
@@ -89,7 +111,10 @@ class ModelResult:
     """
 
     symbols: Sequence[Symbol]
+    """Sequence of symbols gathered from the clingo model."""
+
     cost: list[int]
+    """Optimization cost of the clingo model."""
 
     @classmethod
     def from_model(cls, model: Model) -> Self:

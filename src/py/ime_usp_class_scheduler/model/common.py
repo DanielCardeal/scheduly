@@ -1,3 +1,4 @@
+"""Common dataclasses/functions used throughout the models."""
 from __future__ import annotations
 
 import datetime as dt
