@@ -106,10 +106,12 @@ day.
     is_double(Course),
     Weekday1 != Weekday2.
 
-% Different
-:- class(Course, Group, Weekday, Period1),
-    class(Course, Group, Weekday, Period2),
+% Ensure double classes are scheduled in consecutive periods
+:- class(Course, Group, _, Period1),
+    class(Course, Group, _, Period2),
     is_double(Course),
-    |Period1 - Period2| != 1.
+    Period2 != Period1,
+    |Period2 - Period1| != 1.
+
 
 #show class/4.
