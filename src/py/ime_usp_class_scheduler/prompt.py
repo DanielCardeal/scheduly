@@ -62,9 +62,9 @@ class Confirm(PromptBase[bool]):
         """Convert choices to a bool."""
         value = value.strip().lower()
         match value:
-            case "y" | "yes":
+            case "y" | "yes" | "s" | "sim":
                 return True
-            case "n" | "no":
+            case "n" | "no" | "não" | "nao":
                 return False
             case _:
                 raise InvalidResponse(self.validate_error_message)
