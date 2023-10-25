@@ -83,18 +83,22 @@ def cli(
         LOG_EXCEPTION(e)
         exit(EX_OSERR)
 
-    try:
-        if output_model is not None:
+    if output_model is not None:
+        try:
             if not output_model.exists() or Confirm.ask(
                 f"{output_model} file already exists, overwrite?",
                 default=True,
             ):
-                program.save_program(output_model)
+                with open(output_model, "w") as file:
+                    program.save_program(file)
                 LOG_INFO(f"Starting model saved to {output_model}")
             else:
                 LOG_WARN("Aborted saving model to disk")
-    except FileTreeError as e:
-        LOG_WARN(e)
+        except OSError as e:
+            LOG_ERROR(
+                f"Unable to write program to '{e.filename}': {e.strerror.lower()}"
+            )
+            exit(EX_OSERR)
 
     try:
         program.start()
