@@ -44,9 +44,6 @@ availability(Teacher, N) :-
     teacher(Teacher),
     N = #count { W, P: available(Teacher, W, P) }.
 
-#show period/1.
-#show teacher/1.
-#show conflict/4.
 #show _conflict/6.
 #show _joint/2.
 #show availability/2.
