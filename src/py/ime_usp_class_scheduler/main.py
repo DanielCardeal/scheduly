@@ -81,7 +81,8 @@ def cli(
     try:
         if output_model is not None:
             if not output_model.exists() or Confirm.ask(
-                f"{output_model} file already exists, overwrite?"
+                f"{output_model} file already exists, overwrite?",
+                default=True,
             ):
                 program.save_program(output_model)
                 LOG_INFO(f"Starting model saved to {output_model}")
