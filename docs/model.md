@@ -35,6 +35,11 @@ This page lists and explains all of the predicates and values used within the pr
 
   Register a period that is available for scheduling classes.
 
++ `part_of_day/2(period id, part of the day)`
+
+  Indicate what part of the day (mourning, afternoon, night) a period is
+  part of.
+
 ### Courses' information
 
 

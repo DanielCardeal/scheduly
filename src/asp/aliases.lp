@@ -1,9 +1,4 @@
 %*
-def period/1(period id)
-*%
-period(P) :- period(P, _).
-
-%*
 def is_obligatory/1(course id)
 *%
 is_obligatory(Course) :- curriculum("obligatory", Course, _).

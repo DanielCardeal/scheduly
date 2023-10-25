@@ -4,10 +4,17 @@ def weekday/1(weekday id)
 weekday(0..5).
 
 %*
-def period/2(period id, period name)
+def period/1(period id)
 *%
-period(0..1, "morning").
-period(2..3, "afternoon").
+period(0..3).
+
+%*
+def part_of_day(period id, part of the day)
+*%
+part_of_day(0, "morning").
+part_of_day(1, "morning").
+part_of_day(2, "afternoon").
+part_of_day(3, "afternoon").
 
 %*
 Ensures joint/2 is symmetric
