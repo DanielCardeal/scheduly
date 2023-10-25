@@ -103,6 +103,6 @@ day.
 :- class(Course, Group, Weekday, Period1),
     class(Course, Group, Weekday, Period2),
     is_double(Course),
-    (Period1 - Period2)**2 != 1.
+    |Period1 - Period2| != 1.
 
 #show class/4.
