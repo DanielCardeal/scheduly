@@ -55,10 +55,11 @@ def main() -> None:
     help="Output generated ASP program to PATH",
 )
 @click.option(
-    "-D",
-    "--dump-symbols",
+    "-J",
+    "--dump-json",
+    "dump_symbols",
     is_flag=True,
-    help="Dump a JSON with all shown symbols to stdout.",
+    help="Dump a JSON with the best models results to stdout.",
 )
 def cli(
     preset: str,

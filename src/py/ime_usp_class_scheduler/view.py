@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from clingo import Symbol, SymbolType
+from clingo import SymbolType
 from rich.box import ROUNDED
 from rich.table import Table
 
@@ -62,11 +62,6 @@ class ModelView(ABC):
                         jointed_classes.course_id_b
                     ] = jointed_classes.course_id_a
 
-            if symbol.name not in self.symbols:
-                self.symbols[symbol.name] = []
-            symbol_list_repr = _get_symbol_arguments(symbol)
-            self.symbols[symbol.name].append(symbol_list_repr)
-
         for class_ in self.classes:
             if class_.course_id not in self.jointed:
                 self.schedule[class_.weekday][class_.period].add(class_.course_id)
@@ -111,15 +106,3 @@ class CliTabularView(ModelView):
 
         CONSOLE.print(table)
         CONSOLE.print()
-
-
-def _get_symbol_arguments(symbol: Symbol) -> list[Any]:
-    args: list[Any] = []
-    for arg in symbol.arguments:
-        match arg.type:
-            case SymbolType.Number:
-                args.append(arg.number)
-                pass
-            case SymbolType.String:
-                args.append(arg.string)
-    return args
