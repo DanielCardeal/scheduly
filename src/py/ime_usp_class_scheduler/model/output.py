@@ -13,6 +13,7 @@ class ClingoOutput(Protocol):
 
     @classmethod
     def from_asp(cls, symbol: Symbol) -> Self:
+        """Parse an ASP symbol into an instance of the class."""
         ...
 
 
@@ -28,6 +29,7 @@ class JointedData:
 
     @classmethod
     def from_asp(cls, symbol: Symbol) -> Self:
+        """Parse JointedData from a `_joint/2` or a `joint/2` ASP predicate."""
         assert symbol.type is SymbolType.Function and symbol.name in (
             "joint",
             "_joint",
@@ -55,6 +57,7 @@ class ClassData:
 
     @classmethod
     def from_asp(cls, symbol: Symbol) -> Self:
+        """Parse ClassData from a `class/4` ASP predicate."""
         assert (
             symbol.type is SymbolType.Function and symbol.name == "class"
         ), f"Unable to construct ClassData object from the given symbol: {str(symbol)}"
@@ -89,6 +92,7 @@ class ConflictData:
 
     @classmethod
     def from_asp(cls, symbol: Symbol) -> Self:
+        """Parse ConflictData from a `conflict/6` ASP predicate."""
         assert (
             symbol.type is SymbolType.Function and symbol.name == "conflict"
         ), f"Unable to construct ConflictData object from the given symbol: {str(symbol)}"
@@ -118,6 +122,7 @@ class ModelResult:
 
     @classmethod
     def from_model(cls, model: Model) -> Self:
+        """Extract a ModelResult from a clingo.Model."""
         symbols = model.symbols(shown=True)
         cost = model.cost
         return cls(symbols, cost)
