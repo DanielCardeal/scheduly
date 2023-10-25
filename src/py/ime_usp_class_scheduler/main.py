@@ -1,3 +1,4 @@
+from os import EX_DATAERR, EX_OSERR
 from pathlib import Path
 from textwrap import dedent
 from typing import Optional
@@ -75,9 +76,12 @@ def cli(
             preset, num_schedules=num_schedules, time_limit=time_limit, threads=threads
         )
         program = CliProgram(configuration, dump_symbols=dump_symbols)
-    except (ParsingError, FileTreeError) as e:
+    except ParsingError as e:
         LOG_EXCEPTION(e)
-        exit(1)
+        exit(EX_DATAERR)
+    except FileTreeError as e:
+        LOG_EXCEPTION(e)
+        exit(EX_OSERR)
 
     try:
         if output_model is not None:
@@ -96,7 +100,7 @@ def cli(
         program.start()
     except FileTreeError as e:
         LOG_EXCEPTION(e)
-        exit(1)
+        exit(EX_OSERR)
 
 
 @main.command()
