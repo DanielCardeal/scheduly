@@ -5,6 +5,7 @@ threads = 4
 
 [constraints]
 hard = [
+    { name = "no_split_double" },
     { name = "minimum_spacing" },
     { name = "no_friday_afternoon" },
     { name = "no_obligatory_conflicts" },
