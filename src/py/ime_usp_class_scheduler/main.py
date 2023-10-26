@@ -76,7 +76,7 @@ def cli(
             preset, num_schedules=num_schedules, time_limit=time_limit, threads=threads
         )
         program = CliProgram(configuration, dump_symbols=dump_symbols)
-    except ParsingError as e:
+    except (ParsingError, InconsistentInputError) as e:
         LOG_EXCEPTION(e)
         exit(EX_DATAERR)
     except FileTreeError as e:
