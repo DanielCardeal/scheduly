@@ -455,7 +455,8 @@ class WorkloadData:
                 Function(
                     "joint",
                     [String(course_id_a), String(course_id_b)],
-                ) for course_id_a, course_id_b in combinations(self.courses_id, r=2)
+                )
+                for course_id_a, course_id_b in combinations(self.courses_id, r=2)
             ]
             joint_str = _symbol_to_str(joints)
 

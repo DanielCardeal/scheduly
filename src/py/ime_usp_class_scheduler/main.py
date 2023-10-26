@@ -5,7 +5,11 @@ from typing import Optional
 
 import click
 
-from ime_usp_class_scheduler.errors import FileTreeError, ParsingError
+from ime_usp_class_scheduler.errors import (
+    FileTreeError,
+    InconsistentInputError,
+    ParsingError,
+)
 from ime_usp_class_scheduler.log import LOG_ERROR, LOG_EXCEPTION, LOG_INFO, LOG_WARN
 from ime_usp_class_scheduler.model.configuration import load_preset
 from ime_usp_class_scheduler.paths import HARD_CONSTRAINTS_DIR, SOFT_CONSTRAINTS_DIR
