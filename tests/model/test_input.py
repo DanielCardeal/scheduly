@@ -82,12 +82,12 @@ class TestParsers:
                 WorkloadData,
                 """\
                 courses_id,course_name,offering_group,fixed_classes,teachers_id
-                mac111;mac222,Computer science intro,ime,mon 8:00; wed 14:00,profA@ime.usp.br;profB@google.com
-                mac333,,,,profC@yahoo.com
+                mac111;mac222;mac333,Computer science intro,ime,mon 8:00; wed 14:00,profA@ime.usp.br;profB@google.com
+                mac444,,,,profC@yahoo.com
                 """,
                 [
                     WorkloadData(
-                        courses_id=["mac111", "mac222"],
+                        courses_id=["mac111", "mac222", "mac333"],
                         teachers_id=["profA", "profB"],
                         fixed_classes={
                             ScheduleTimeslot(Weekday.MONDAY, Period.MORNING_1),
@@ -97,7 +97,7 @@ class TestParsers:
                         offering_group="ime",
                     ),
                     WorkloadData(
-                        courses_id=["mac333"],
+                        courses_id=["mac444"],
                         teachers_id=["profC"],
                     ),
                 ],
@@ -181,14 +181,6 @@ class TestParsers:
                 """,
             ),
             (
-                # Workload data with too much courses ids
-                WorkloadData,
-                """\
-                courses_id,course_name,offering_group,fixed_classes,teachers_id
-                mac111;mac222;mac333,,,,profA@ime.usp.br
-                """,
-            ),
-            (
                 # Workload data without teachers ids
                 WorkloadData,
                 """\
@@ -254,18 +246,21 @@ class TestInputDataset:
         bad_workload = [
             WorkloadData(
                 courses_id=["mac111"],
+                offering_group="BCC",
                 teachers_id=["profAAA"],
-                offering_group="",
+                class_period="I",
             ),
             WorkloadData(
                 courses_id=["mac111"],
                 teachers_id=["profBBB"],
                 offering_group="POS_BCC",
+                class_period="M",
             ),  # should not conflict, since is a "multi index"
             WorkloadData(
                 courses_id=["mac111"],
-                teachers_id=["profAAA"],
                 offering_group="BCC",
+                teachers_id=["profCCC"],
+                class_period="N",
             ),
         ]
         bad_curriculum = [

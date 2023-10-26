@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import datetime as dt
 import re
+from itertools import combinations
 from pathlib import Path
 from typing import IO, Hashable, Protocol, Sequence, TypeVar
 
@@ -387,8 +388,6 @@ class WorkloadData:
     def _validate_courses_id(self, _: str, courses_id: list[str]) -> None:
         if len(courses_id) < 1:
             raise ValueError("Expected at least one course id.")
-        elif len(courses_id) > 2:
-            raise ValueError("Exceded the maximum ammount of course IDs")
         for course_id in courses_id:
             if not course_id:
                 raise ValueError("Invalid empty course id")
@@ -418,7 +417,7 @@ class WorkloadData:
 
     @property
     def index(self) -> tuple[str, ...]:
-        return (*self.courses_id, *self.teachers_id)
+        return (*self.courses_id, self.offering_group)
 
     def into_asp(self) -> str:
         """Convert self into lecturer/3 and class/5 ASP predicates."""
@@ -451,13 +450,14 @@ class WorkloadData:
             ]
 
         joint_str = ""
-        if len(self.courses_id) == 2:
-            joint_str = _symbol_to_str(
+        if len(self.courses_id) > 1:
+            joints = [
                 Function(
                     "joint",
-                    [String(self.courses_id[0]), String(self.courses_id[1])],
-                )
-            )
+                    [String(course_id_a), String(course_id_b)],
+                ) for course_id_a, course_id_b in combinations(self.courses_id, r=2)
+            ]
+            joint_str = _symbol_to_str(joints)
 
         lecturers_str = _symbol_to_str(lecturers)
         fixed_classes_str = "\n".join([f":- not {fixed}." for fixed in fixed_classes])
