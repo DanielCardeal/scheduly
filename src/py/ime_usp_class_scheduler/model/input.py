@@ -28,6 +28,9 @@ DEFAULT_PERIOD_LENGTH = dt.timedelta(hours=1, minutes=40)
 DEFAULT_CLASS_PERIOD = {PartOfDay.MORNING, PartOfDay.AFTERNOON}
 """The default periods to try to schedule classes."""
 
+DEFAULT_OFFERING_GROUP = "BCC"
+"""The default offering group."""
+
 
 def _symbol_to_str(symbols: Symbol | list[Symbol]) -> str:
     """Converts an symbol/list of ASP symbols to an ASP code string.
@@ -150,6 +153,13 @@ def _class_period_converter(period: str | set[PartOfDay]) -> set[PartOfDay]:
     raise ValueError(
         f"Unable to convert value {period} of type {type(period)} to periods."
     )
+
+
+def _offering_group_converter(group: str) -> str:
+    """Normalize an offering group string."""
+    if not group:
+        group = DEFAULT_OFFERING_GROUP
+    return group.strip().lower()
 
 
 def _schedule_timeslots_converter(
@@ -419,6 +429,9 @@ class WorkloadData:
     teachers_id: list[str] = field(converter=_teacher_list_converter)
     """List of the courses' lecturers unique identifiers."""
 
+    offering_group: str = field(converter=_offering_group_converter)
+    """Unique identifier for the course offering group."""
+
     @teachers_id.validator
     def _validate_teachers_id(self, _: str, teachers_id: list[str]) -> None:
         if len(teachers_id) < 1:
@@ -441,9 +454,6 @@ class WorkloadData:
 
     course_name: str = ""
     """Course long-form written name."""
-
-    offering_group: str = ""
-    """Unique identifier for the course offering group."""
 
     @property
     def index(self) -> tuple[str, ...]:
