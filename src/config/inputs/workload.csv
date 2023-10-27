@@ -1,8 +1,1 @@
-courses_id,course_name,offering_group,fixed_classes,teachers_id
-MAC0105,Fundamentos de Matemática para a Computação,BCC,qua 14:00; sex 08:00,mota@ime.usp.br
-MAC0110,Introdução à Computação,BCC,seg 08:00; qua 10:00,mqz@ime.usp.br
-MAC0422;MAC5753,Sistemas Operacionais,BCC,seg 10:00; qua 08:00,durham@ime.usp.br
-MAC0425,Inteligência Artificial,,,renata@ime.usp.br
-MAC0218,Técnicas de Programação 2,,,gold@ime.usp.br
-MAC0219,Introdução à Computação Paralela e Distribuída,,,gold@ime.usp.br
-MAC0318,,BCC,,leliane@ime.usp.br
+2024-1/workload.csv

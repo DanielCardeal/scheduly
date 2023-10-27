@@ -1,0 +1,101 @@
+courses_id,course_name,class_period,offering_group,fixed_classes,teachers_id
+MAC0329,Álgebra Booleana e Aplicações,,BCC,Ter 08:00; qui 10:00,nina@ime.usp.br
+MAC0210,Laboratório de Métodos Numéricos,,BCC,Ter 08:00; qui 10:00,mqz@ime.usp.br
+MAC0323,Algoritmos e Estruturas de Dados II,,BCC,Ter 10:00; qui 08:00,yoshi@ime.usp.br
+MAC0350,Introdução ao Desenvolvimento de Sistemas de Software,,BCC,Ter 10:00; qui 08:00,paulormm@ime.usp.br
+MAC0422,Sistemas Operacionais,,BCC,Seg 10:00; qua 08:00,batista@ime.usp.br
+MAC0427,Otimização não Linear (BMA),,BCC,Seg 16:00; qui 14:00,leo@ime.usp.br
+MAC0121,Algoritmos e Estruturas de Dados I,,BCC,Ter 08:00; qui 10:00,mota@ime.usp.br
+MAC0216,Técnicas de Programação I,,BCC,Seg 14:00; qui 16:00,kellyrb@ime.usp.br
+MAC0239,Introdução à Logica e Verificação de Programas,,BCC,Ter 14:00; sex 10:00,renata@ime.usp.br
+MAC0316,Conceitos Fundamentais de Ling. de Prog.,,BCC,Qua 10:00; sex 08:00,durham@ime.usp.br
+MAC0338,Análise de Algoritmos,,BCC,Ter 10:00; qui 08:00,cris@ime.usp.br
+MAC0315,Otimização Linear (BMA),,BCC,Ter 10:00; qui 08:00,walterfm@ime.usp.br
+MAC0313,Introd aos Sistemas de Bancos de Dados,,BE,Ter 10:00; qui 08:00,kellyrb@ime.usp.br
+MAT0122,Álgebra Linear I,,BCC,,yoshi@ime.usp.br
+MAC0105,Fundamentos de Matemática para a Computação,,BCC,Qua 14:00; sex 08:00,mota@ime.usp.br
+MAC0110,Introdução à Computação,,BCC,Seg 08:00; qua 10:00,hirata@ime.usp.br
+MAC0209,Modelagem e Simulação,,BCC,Seg 14:00 16:00,cesar@ime.usp.br
+MAC0101,Introdução à Ciência da Computação,,BCC,ter 13:00-14:40,leliane@ime.usp.br
+MAC0102,Caminhos no Bacharelado em Ciência da Computação,,BCC,qui 13:00-14:40,fcs@ime.usp.br
+CCM0128 ,Computação II (Ciências Moleculares),,BCC,Ter 14:00; qua 16:00,ddm@ime.usp.br
+MAC0110,Introdutória ,,BE+BM+BMA 1,Ter 08:00; qui 10:00,nami@ime.usp.br
+MAC0110,Introdutória ,,BE+BM+BMA 2,Ter 08:00; qui 10:00,jb@ime.usp.br
+MAC0110,Introdutória,,LM,Ter 10:00; sex 13:20,leo@ime.usp.br
+MAC0115,Introdutória,,IAG Meteorologia,Ter 10:00; qui 08:00,leliane@ime.usp.br
+MAC0321,Laboratório de Programação Orientada a Objetos ,,Poli EC - PCS 1,Qui 08:20 10:20,mfinger@ime.usp.br
+MAC0321,Laboratório de Programação Orientada a Objetos,,Poli EC - PCS 2,Sex 08:20 10:20,mfinger@ime.usp.br
+CCM0118 ,Computação I (Ciências Moleculares),,Ciências Moleculares,Ter 14:00; qua 16:00,yoshi@ime.usp.br
+MAC0115,Introdutória,,BF-1,Ter 10:00; qui 8:00 ,jb@ime.usp.br
+MAC0115,Introdutória,,BF-2,Ter 10:00; qui 10:00,ddm@ime.usp.br
+MAC0115,Introdutória,,IAG Geofísica,Qua 14:00; sex 14:00,gold@ime.usp.br
+MAC0115;IBI5011,Introdutória,,IO,Qua 10:00; sex 10:00,egbirgin@ime.usp.br
+MAC0119;IBI5011,Introd (Ciências Biomédicas) Python/Perl,,Ciências Biomédicas,Qua 08:00 10:00,fujita@ime.usp.br
+MAC0122,Princípios de Desenv. de Alg. ,,BE+BM+BMA 1,Ter 08:00; qui 10:00,coelho@ime.usp.br
+MAC0122,Princípios de Desenv. de Alg.,,BE+BM+BMA 2,Ter 08:00; qui 10:00,hitoshi@ime.usp.br
+MAC2166,Introdução à Computação (Poli) - C,,Poli C 1,,fcs@ime.usp.br
+MAC2166,Introdução à Computação (Poli) - C,,Poli C 2,,alair@ime.usp.br
+MAC2166,Introdução à Computação (Poli) - C,,Poli C 3,,alair@ime.usp.br
+MAC2166,Introdução à Computação (Poli) - python,,Poli Python 1,,batista@ime.usp.br
+MAC2166,Introdução à Computação (Poli) - python,,Poli Python 2,,kon@ime.usp.br
+MAC2166,Introdução à Computação (Poli) - python,,Poli Python 3,,renata@ime.usp.br
+MAC2166,Introdução à Computação (Poli) - python,,Poli Python 4,,renata@ime.usp.br
+MAC2166,Introdução à Computação (Poli) - python,,Poli Python 5,,novo
+MAC2166,Introdução à Computação (Poli) - python,,Poli Python 6,,novo
+MAC2166,Introdução à Computação (Poli) - python,,Poli Python 7,,pmiranda@ime.usp.br
+MAC2166,Introdução à Computação (Poli) - python,,Poli Python 8,,pmiranda@ime.usp.br
+MAC2166,Introdução à Computação (Poli) - python,,Poli Python 9,,ronaldo@ime.usp.br
+MAC2166,Introdução à Computação (Poli) - turma 13 (Web),,Poli Web (C + Python),,fujita@ime.usp.br
+MAC0113,Introdução à Computação para Ciências Humanas,N,FEA 1 – IntroNoturnoFEA,Ter 19:30; qui 21:20,srobins@ime.usp.br
+MAC0113,Introdução à Computação para Ciências Humanas,N,FEA 2 – IntroNoturnoFEA,Ter 21:20; qui 19:30,srobins@ime.usp.br
+MAC0110,Introdutória (BMac),N,BMAC,Qua 21:10; sex 19:20,lago@ime.usp.br
+MAC0427 ,Otimização não Linear (BMac),N,BMAC,Seg 19:20; qui 21:10,egbirgin@ime.usp.br
+MAC0110,Introdutória (LM),N,LM 1,Ter 21:10; sex 19:20,cesar@ime.usp.br
+MAC0110,Introdutória (LM),N,LM 2,Ter 21:10; sex 19:20,paulormm@ime.usp.br
+MAC0115,Introdutória (BF),N,BF 1,Ter 19:00; qui 21:00,yoshiko@ime.usp.br
+MAC0115,Introdutória (BF),N,BF 2,Ter 19:00; qui 21:00,lago@ime.usp.br
+MAC0122,Princípios de Desenv. de Algoritmos (BMac),N,BMAC,Ter 19:20; qui 21:10,mms@ime.usp.br
+MAC0315,Otimização Linear (BMac),N,BMAC,Ter 19:20; qui 21:10,walterfm@ime.usp.br
+MAC4722,"Linguagens, Autômatos e Computabilidade",,,,alair@ime.usp.br
+MAC0426;MAC5760,Sistemas de Bancos de Dados,,,,kellyrb@ime.usp.br
+MAC5711,Análise de Algoritmos,,,,mksilva@ime.usp.br
+MAC0413;MAC5714,Tópicos Avançados de Programação Orientada a Objetos,,,,kon@ime.usp.br
+MAC6992;IBI5092,Introdução de Estatística de Redes,,,,fujita@ime.usp.br
+IBI5031,Reconhecimento de Padrões I,,,,ronaldo@ime.usp.br
+IBI5037,Algoritmos em Bioinformática,,,,durham@ime.usp.br
+MAC0325;MAC5781,Otimização Combinatória,,,,mksilva@ime.usp.br
+MAC0320 ,Introdução à Teoria dos Grafos,,,,yoshiko@ime.usp.br
+MAC0536;MAC6928,Tópicos na Teoria dos Números,,,,srobins@ime.usp.br
+MAC0695;MAC5923,Combinatória II,,,,mota@ime.usp.br
+MAC6958,Tópicos Avançados em Ciência de Dados para Redes de Computadores ,,,,hirata@ime.usp.br
+MAC0470;MAC5856,Desenvolvimento de Software Livre,,,,paulormm@ime.usp.br
+MAC0472;MAC5716;MAC5717,Laboratório de Métodos Ágeis,,,,gold@ime.usp.br
+MAC0425;MAC5739,Inteligência Artificial,,,,ddm@ime.usp.br
+MAC0417;MAC5768,Visão Computacional e Processamento de Imagens,,,,ronaldo@ime.usp.br
+MAC0420;MAC5744,Introdução à Computação Gráfica,,,,hitoshi@ime.usp.br
+MAC0460;MAC5832,Introdução ao Aprendizado de Máquina,,,,jb@ime.usp.br
+MAC0337;MAC5900,Computação Musical,,,,mqz@ime.usp.br
+MAC5771,Teoria dos Grafos,,,,lucchesi@ime.usp.br
+MAC5770,Introdução à teoria dos Grafos,,,,yoshiko@ime.usp.br
+MAC0414,"Autômatos, Computabilidade e Complexidade",,,,am@ime.usp.br
+MAC0328,Algoritmos em Grafos,,,,mksilva@ime.usp.br
+MAC0430;MAC5722,Complexidade Computacional,,,,coelho@ime.usp.br
+MAC0300;MAC6920;MAP5904,Métodos Numéricos de Álgebra Linear,,,,egbirgin@ime.usp.br
+MAC5857,Desenvolvimento de Sistemas Web para Apoio ao Ensino/Aprendizagem,,,,leo@ime.usp.br
+MAC0219;MAC5742,Introdução à Computação Paralela e Distribuída,,,,gold@ime.usp.br
+MAC0332;MAC5783,Engenharia de Software,,,,paulormm@ime.usp.br
+MAC5754,Conceitos de Linguagens de Programação,,,,durham@ime.usp.br
+MAC6919,Teste de Software Baseado em Modelos,,,,acvm@ime.usp.br
+MAC0318,Introdução à Robótica Móvel,,,,leliane@ime.usp.br
+MAC5850,Computabilidade e Tratabilidade via Lógica,,,,mfinger@ime.usp.br
+MAC5784,Inteligência Artificial em Jogos de Computador,,,,fcs@ime.usp.br
+MAC0446;MAC5786,Princípios de Interação Humano-Computador,,,,hitoshi@ime.usp.br
+MAC0459;MAC5865,Tópicos em Ciência e Engenharia de Dados,,,,hirata@ime.usp.br
+MAC6903,Processamento de Imagens usando Grafos,,,,pmiranda@ime.usp.br
+MAC0447;MAC5749,Análise e Reconhecimento de Formas: Teoria e Prática,,,,cesar@ime.usp.br
+MAC5921,Deep Learning,,,,nina@ime.usp.br
+MAC0336;MAC5723,Criptografia para Segurança de Dados,,,,rt@ime.usp.br
+MAC0344,Arquitetura de Computadores,,,,siang@ime.usp.br
+MAC6953,"Seminários em Combinatória Extremal, Probabilística e Aditiva I",,,,mota@ime.usp.br
+MAC6936,Estudos Avançados em Medidas de Conectividade I,,,,fujita@ime.usp.br
+MAC6954,"Seminários em Combinatória Extremal, Probabilística e Aditiva II",,,,mota@ime.usp.br
