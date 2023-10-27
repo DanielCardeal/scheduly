@@ -6,8 +6,9 @@ import pytest
 from cattrs.errors import BaseValidationError
 
 from ime_usp_class_scheduler.errors import InconsistentInputError
-from ime_usp_class_scheduler.model.common import Period, Weekday
+from ime_usp_class_scheduler.model.common import PartOfDay, Period, Weekday
 from ime_usp_class_scheduler.model.input import (
+    DEFAULT_CLASS_PERIOD,
     AspInput,
     CourseData,
     CurriculumData,
@@ -81,9 +82,9 @@ class TestParsers:
             (
                 WorkloadData,
                 """\
-                courses_id,course_name,offering_group,fixed_classes,teachers_id
-                mac111;mac222;mac333,Computer science intro,ime,mon 8:00; wed 14:00,profA@ime.usp.br;profB@google.com
-                mac444,,,,profC@yahoo.com
+                courses_id,class_period,course_name,offering_group,fixed_classes,teachers_id
+                mac111;mac222;mac333,night,Computer science intro,ime,mon 8:00; wed 14:00,profA@ime.usp.br;profB@google.com
+                mac444,,,,,profC@yahoo.com
                 """,
                 [
                     WorkloadData(
@@ -93,12 +94,17 @@ class TestParsers:
                             ScheduleTimeslot(Weekday.MONDAY, Period.MORNING_1),
                             ScheduleTimeslot(Weekday.WEDNESDAY, Period.AFTERNOON_1),
                         },
+                        class_period={PartOfDay.NIGHT},
                         course_name="Computer science intro",
                         offering_group="ime",
                     ),
                     WorkloadData(
                         courses_id=["mac444"],
                         teachers_id=["profC"],
+                        fixed_classes=set(),
+                        class_period=DEFAULT_CLASS_PERIOD,
+                        course_name="",
+                        offering_group="",
                     ),
                 ],
             ),
@@ -176,16 +182,16 @@ class TestParsers:
                 # Workload data without courses ids
                 WorkloadData,
                 """\
-                courses_id,course_name,offering_group,fixed_classes,teachers_id
-                ,,,,profA@ime.usp.br
+                courses_id,class_period,course_name,offering_group,fixed_classes,teachers_id
+                ,,,,,profA@ime.usp.br
                 """,
             ),
             (
                 # Workload data without teachers ids
                 WorkloadData,
                 """\
-                courses_id,course_name,offering_group,fixed_classes,teachers_id
-                mac111,,,,
+                courses_id,class_period,course_name,offering_group,fixed_classes,teachers_id
+                mac111,,,,,
                 """,
             ),
             (

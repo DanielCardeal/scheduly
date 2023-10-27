@@ -6,7 +6,7 @@ weekday(0..5).
 %*
 def period/1(period id)
 *%
-period(0..3).
+period(0..5).
 
 %*
 def part_of_day(period id, part of the day)
@@ -15,6 +15,8 @@ part_of_day(0, "morning").
 part_of_day(1, "morning").
 part_of_day(2, "afternoon").
 part_of_day(3, "afternoon").
+part_of_day(4, "night").
+part_of_day(5, "night").
 
 %*
 Ensures joint/2 is symmetric
@@ -88,6 +90,13 @@ unless they are jointed.
     lecturer(CourseA, GroupA, Teacher),
     lecturer(CourseB, GroupB, Teacher),
     conflict(CourseA, GroupA, CourseB, GroupB).
+
+%*
+Classes should be scheduled in the correct parts of the day
+*%
+:- class(Course, Group, _, Period),
+    part_of_day(Period, PartOfDay),
+    not schedule_on(Course, Group, PartOfDay).
 
 %*
 Classes must respect the lecturer(s)' available times.

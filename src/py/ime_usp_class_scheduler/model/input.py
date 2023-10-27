@@ -19,11 +19,14 @@ from ime_usp_class_scheduler.errors import (
     ParsingError,
 )
 from ime_usp_class_scheduler.log import LOG_WARN
-from ime_usp_class_scheduler.model.common import CONVERTER, Period, Weekday
+from ime_usp_class_scheduler.model.common import CONVERTER, PartOfDay, Period, Weekday
 from ime_usp_class_scheduler.paths import INPUT_DIR
 
 DEFAULT_PERIOD_LENGTH = dt.timedelta(hours=1, minutes=40)
 """The default length of a period in the educational institution"""
+
+DEFAULT_CLASS_PERIOD = {PartOfDay.MORNING, PartOfDay.AFTERNOON}
+"""The default periods to try to schedule classes."""
 
 
 def _symbol_to_str(symbols: Symbol | list[Symbol]) -> str:
@@ -126,6 +129,27 @@ def _boolean_converter(boolean_value: str | bool) -> bool:
         raise ValueError(
             f"Unable to convert value {boolean_value} of type {type(boolean_value)} to a bool."
         )
+
+
+def _class_period_converter(period: str | set[PartOfDay]) -> set[PartOfDay]:
+    """If `period` is already a `set[PartOfDay]`, just forward it as the output.
+    Otherwise, try parsing the string as a set of parts of the day using
+    `PartOfDay.from_str`.
+
+    Empty strings are parsed as `DEFAULT_CLASS_PERIOD`.
+    """
+    if isinstance(period, set):
+        return period
+
+    if isinstance(period, str):
+        if period:
+            return PartOfDay.from_str(period)
+        else:
+            return DEFAULT_CLASS_PERIOD
+
+    raise ValueError(
+        f"Unable to convert value {period} of type {type(period)} to periods."
+    )
 
 
 def _schedule_timeslots_converter(
@@ -403,6 +427,12 @@ class WorkloadData:
             if not teacher_id:
                 raise ValueError("Invalid empty teacher id")
 
+    class_period: set[PartOfDay] = field(
+        converter=_class_period_converter,
+        validator=validators.min_len(1),
+    )
+    """Parts of the day in which classes can be scheduled."""
+
     fixed_classes: set[ScheduleTimeslot] = field(
         factory=set,
         converter=_schedule_timeslots_converter,
@@ -420,9 +450,12 @@ class WorkloadData:
         return (*self.courses_id, self.offering_group)
 
     def into_asp(self) -> str:
-        """Convert self into lecturer/3 and class/5 ASP predicates."""
+        """Convert self into lecturer/3, class/5, joint/2 and class_part_of_day/3
+        ASP predicates.
+        """
         lecturers = []
         fixed_classes = []
+        schedule_on = []
 
         for course_id in self.courses_id:
             for teacher_id in self.teachers_id:
@@ -449,6 +482,18 @@ class WorkloadData:
                 for t in self.fixed_classes
             ]
 
+            schedule_on += [
+                Function(
+                    "schedule_on",
+                    [
+                        String(course_id),
+                        String(self.offering_group),
+                        String(str(part_of_day)),
+                    ],
+                )
+                for part_of_day in self.class_period
+            ]
+
         joint_str = ""
         if len(self.courses_id) > 1:
             joints = [
@@ -461,8 +506,11 @@ class WorkloadData:
             joint_str = _symbol_to_str(joints)
 
         lecturers_str = _symbol_to_str(lecturers)
+        schedule_on_str = _symbol_to_str(schedule_on)
         fixed_classes_str = "\n".join([f":- not {fixed}." for fixed in fixed_classes])
-        return "\n".join((lecturers_str, fixed_classes_str, joint_str))
+        return "\n".join(
+            (lecturers_str, fixed_classes_str, joint_str, schedule_on_str)
+        )
 
 
 @frozen

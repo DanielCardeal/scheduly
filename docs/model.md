@@ -66,6 +66,11 @@ This page lists and explains all of the predicates and values used within the pr
   Indicates that `course A` and `course B` should be offered in the same
   classroom and at the same time.
 
++ `schedule_on/3(course id, offering group, part of the day)`
+  
+  Allow an offering of a course to be scheduled in a given part of the day.
+  Courses can be allowed to be scheduled in more than one given part of the day.
+
 ### Curricula information
 
 + `curriculum/3(curriculum id, course id, is required)`
@@ -116,8 +121,6 @@ This page lists and explains all of the predicates and values used within the pr
 
 This predicates don't add information about the model, but they facilitate
 writing rules in a more concise manner. 
-
-+ `period/1(period id)`
 
 + `teacher/1(teacher id)`
 
