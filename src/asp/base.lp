@@ -80,13 +80,11 @@ conflict(CourseA, Group, CourseB, Group, Weekday, Period) :-
     not joint(CourseA, CourseB, Group).
 
 %*
-Two classes taught by the same teacher cannot be in conflict with eachother,
-unless they are jointed.
+Two classes taught by the same teacher shouldn't conflict.
 *%
-:- not joint(CourseA, CourseB, Group),
-    lecturer(CourseA, Group, Teacher),
-    lecturer(CourseB, Group, Teacher),
-    conflict(CourseA, Group, CourseB, Group).
+:- conflict(CourseA, GroupA, CourseB, GroupB),
+    lecturer(CourseA, GroupA, Teacher),
+    lecturer(CourseB, GroupB, Teacher).
 
 %*
 Classes should be scheduled in the correct parts of the day
