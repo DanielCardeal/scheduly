@@ -27,16 +27,20 @@ class JointedData:
     course_id_b: str
     """Second of the conflicting courses."""
 
+    offering_group: str
+    """The offering group of the conflicting classes"""
+
     @classmethod
     def from_asp(cls, symbol: Symbol) -> Self:
-        """Parse JointedData from a `_joint/2` or a `joint/2` ASP predicate."""
+        """Parse JointedData from a `_joint/3` or a `joint/3` ASP predicate."""
         assert symbol.type is SymbolType.Function and symbol.name in (
             "joint",
             "_joint",
         ), f"Unable to construct JointedData object from the given symbol: {str(symbol)}"
         course_id_a = symbol.arguments[0].string
         course_id_b = symbol.arguments[1].string
-        return cls(course_id_a, course_id_b)
+        offering_group = symbol.arguments[2].string
+        return cls(course_id_a, course_id_b, offering_group)
 
 
 @frozen

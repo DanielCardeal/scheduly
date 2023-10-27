@@ -19,9 +19,9 @@ part_of_day(4, "night").
 part_of_day(5, "night").
 
 %*
-Ensures joint/2 is symmetric
+Ensures joint/3 is symmetric
 *%
-joint(CourseB, CourseA) :- joint(CourseA, CourseB).
+joint(CourseB, CourseA, OfferingGroup) :- joint(CourseA, CourseB, OfferingGroup).
 
 %*
 def primary_lecturer(course id, group id, teacher id)
@@ -41,21 +41,20 @@ def class/4(
 *%
 % Schedule non-jointed classes
 { class(Course, Group, W, P): available(Teacher, W, P) } == NumClasses :-
-    not joint(Course, _),
+    not joint(Course, _, Group),
     num_classes(Course, NumClasses),
     lecturer(Course, Group, Teacher).
 
 % Schedule jointed classes
-{ class(CourseA, GroupA, W, P): available(Teacher, W, P) } == NumClasses :-
-    joint(CourseA, CourseB),
+{ class(CourseA, Group, W, P): available(Teacher, W, P) } == NumClasses :-
+    joint(CourseA, CourseB, Group),
     num_classes(CourseA, NumClasses),
-    lecturer(CourseA, GroupA, _).
+    lecturer(CourseA, Group, _).
 
-class(CourseB, GroupB, W, P) :-
-    joint(CourseA, CourseB),
-    lecturer(CourseB, GroupB, _),
-    class(CourseA, _, W, P).
-
+class(CourseB, OfferingGroup, W, P) :-
+    joint(CourseA, CourseB, OfferingGroup),
+    lecturer(CourseB, OfferingGroup, _),
+    class(CourseA, OfferingGroup, W, P).
 
 %*
 def conflict/6(
@@ -67,29 +66,27 @@ def conflict/6(
     conflict period
 )
 *%
-% Class conflict
-conflict(CourseA, GroupA, CourseB, GroupB, Weekday, Period) :-
-    class(CourseA, GroupA, Weekday, Period),
-    class(CourseB, GroupB, Weekday, Period),
-    not joint(CourseA, CourseB),
-    CourseA != CourseB.
-
 % Group conflict
 conflict(CourseA, GroupA, CourseB, GroupB, Weekday, Period) :-
     class(CourseA, GroupA, Weekday, Period),
     class(CourseB, GroupB, Weekday, Period),
-    not joint(CourseA, CourseB),
-    CourseA == CourseB,
     GroupA != GroupB.
+
+% Class conflict
+conflict(CourseA, Group, CourseB, Group, Weekday, Period) :-
+    class(CourseA, Group, Weekday, Period),
+    class(CourseB, Group, Weekday, Period),
+    CourseA != CourseB,
+    not joint(CourseA, CourseB, Group).
 
 %*
 Two classes taught by the same teacher cannot be in conflict with eachother,
 unless they are jointed.
 *%
-:- not joint(CourseA, CourseB),
-    lecturer(CourseA, GroupA, Teacher),
-    lecturer(CourseB, GroupB, Teacher),
-    conflict(CourseA, GroupA, CourseB, GroupB).
+:- not joint(CourseA, CourseB, Group),
+    lecturer(CourseA, Group, Teacher),
+    lecturer(CourseB, Group, Teacher),
+    conflict(CourseA, Group, CourseB, Group).
 
 %*
 Classes should be scheduled in the correct parts of the day

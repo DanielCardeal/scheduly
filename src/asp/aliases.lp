@@ -35,7 +35,7 @@ _conflict(CourseA, GroupA, CourseB, GroupB, Weekday, Period) :-
 %*
 def _joint/2(course A id, course B id)
 *%
-_joint(CourseA, CourseB) :- joint(CourseA, CourseB), CourseA > CourseB.
+_joint(CourseA, CourseB, Group) :- joint(CourseA, CourseB, Group), CourseA > CourseB.
 
 %*
 availability/2(teacher id, number of available teaching periods)
@@ -45,5 +45,5 @@ availability(Teacher, N) :-
     N = #count { W, P: available(Teacher, W, P) }.
 
 #show _conflict/6.
-#show _joint/2.
+#show _joint/3.
 #show availability/2.

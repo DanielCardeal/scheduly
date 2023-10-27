@@ -450,7 +450,7 @@ class WorkloadData:
         return (*self.courses_id, self.offering_group)
 
     def into_asp(self) -> str:
-        """Convert self into lecturer/3, class/5, joint/2 and class_part_of_day/3
+        """Convert self into lecturer/3, class/5, joint/3 and class_part_of_day/3
         ASP predicates.
         """
         lecturers = []
@@ -499,7 +499,11 @@ class WorkloadData:
             joints = [
                 Function(
                     "joint",
-                    [String(course_id_a), String(course_id_b)],
+                    [
+                        String(course_id_a),
+                        String(course_id_b),
+                        String(self.offering_group),
+                    ],
                 )
                 for course_id_a, course_id_b in combinations(self.courses_id, r=2)
             ]
@@ -508,9 +512,7 @@ class WorkloadData:
         lecturers_str = _symbol_to_str(lecturers)
         schedule_on_str = _symbol_to_str(schedule_on)
         fixed_classes_str = "\n".join([f":- not {fixed}." for fixed in fixed_classes])
-        return "\n".join(
-            (lecturers_str, fixed_classes_str, joint_str, schedule_on_str)
-        )
+        return "\n".join((lecturers_str, fixed_classes_str, joint_str, schedule_on_str))
 
 
 @frozen

@@ -16,13 +16,15 @@ from ime_usp_class_scheduler.model.output import (
     ModelResult,
 )
 
+MAX_OFFERING_GROUP_LENGTH = 20
+
 
 class ModelView(ABC):
     """Objects that are capable of displaying a clingo.Model"""
 
     classes: set[ClassData]
     conflicts: set[ConflictData]
-    jointed: dict[str, str]
+    jointed: dict[tuple[str, str], str]
 
     def __init__(self) -> None:
         super().__init__()
@@ -56,36 +58,24 @@ class ModelView(ABC):
                 case "_joint":
                     jointed_classes = JointedData.from_asp(symbol)
                     self.jointed[
-                        jointed_classes.course_id_a
+                        (jointed_classes.course_id_a, jointed_classes.offering_group)
                     ] = jointed_classes.course_id_b
                     self.jointed[
-                        jointed_classes.course_id_b
+                        (jointed_classes.course_id_b, jointed_classes.offering_group)
                     ] = jointed_classes.course_id_a
-
-        for class_ in self.classes:
-            if class_.course_id not in self.jointed:
-                self.schedule[class_.weekday][class_.period].add(class_.course_id)
-                continue
-
-            # Pretty printing jointed classes:
-            # - The first of the jointed classes that is found is added to the
-            #   schedule to mark it has been seen.
-            # - The second of the jointed class that is found removes the first
-            #   one and adds the pretty version (macXXX - macYYY) to the schedule
-            jointed_class = self.jointed[class_.course_id]
-            if jointed_class not in self.schedule[class_.weekday][class_.period]:
-                # First jointed class found
-                self.schedule[class_.weekday][class_.period].add(class_.course_id)
-            else:
-                # Second jointed class found
-                self.schedule[class_.weekday][class_.period].remove(jointed_class)
-                self.schedule[class_.weekday][class_.period].add(
-                    f"{class_.course_id} - {jointed_class}"
-                )
 
 
 class CliTabularView(ModelView):
     """Model viewer that displays models as pretty CLI tables."""
+
+    def _update_schedule(self, model: ModelResult) -> None:
+        super()._update_schedule(model)
+
+        for class_ in self.classes:
+            class_str = f"{class_.course_id} ({class_.offering_group[:MAX_OFFERING_GROUP_LENGTH]})"
+            if (class_.course_id, class_.offering_group) in self.jointed:
+                class_str += " *"
+            self.schedule[class_.weekday][class_.period].add(class_str)
 
     def show_model(self, model: ModelResult) -> None:
         """Displays the model as a pretty CLI table."""
