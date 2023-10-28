@@ -1,11 +1,12 @@
 %*
-Avoid scheduling classes in the afternoon.
+Prefer to schedule classes in the morning.
 *%
-afternoon_class(Course, Group, Weekday, Period) :-
-    class(Course, Group, Weekday, Period),
-    part_of_day(P, "afternoon").
+non_morning_class(Course, Group, Weekday, Period) :-
+    class(Course, Group, Weekday, Period, false),
+    part_of_day(P, PartOfDay),
+    PartOfDay != "morning".
 
-:~ afternoon_class(Course, Group, Weekday, Period).
+:~ non_morning_class(Course, Group, Weekday, Period).
 [w_early_classes@p_early_classes, Course, Group, Weekday, Period]
 
-#show afternoon_class/4.
+#show non_morning_class/4.

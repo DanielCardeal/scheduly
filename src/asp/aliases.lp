@@ -1,4 +1,14 @@
 %*
+def const true
+*%
+#const true = 1.
+
+%*
+def const false
+*%
+#const false = 0.
+
+%*
 def is_obligatory/1(course id)
 *%
 is_obligatory(Course) :- curriculum("obligatory", Course, _).

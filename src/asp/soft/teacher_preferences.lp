@@ -2,7 +2,7 @@
 Avoid scheduling classes in teacher's preferred times.
 *%
 not_at_teacher_preferred(Course, Group, Teacher, W, P) :-
-    class(Course, Group, W, P),
+    class(Course, Group, W, P, false),
     lecturer(Course, Group, Teacher),
     not preferred(Teacher, W, P).
 

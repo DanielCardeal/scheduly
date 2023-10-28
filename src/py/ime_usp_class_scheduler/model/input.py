@@ -487,6 +487,7 @@ class WorkloadData:
                         String(self.offering_group),
                         Number(t.weekday.value),
                         Number(t.period.value),
+                        Number(True),
                     ],
                 )
                 for t in self.fixed_classes
@@ -521,7 +522,7 @@ class WorkloadData:
 
         lecturers_str = _symbol_to_str(lecturers)
         schedule_on_str = _symbol_to_str(schedule_on)
-        fixed_classes_str = "\n".join([f":- not {fixed}." for fixed in fixed_classes])
+        fixed_classes_str = "\n".join([f"{fixed}." for fixed in fixed_classes])
         return "\n".join((lecturers_str, fixed_classes_str, joint_str, schedule_on_str))
 
 

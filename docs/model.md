@@ -61,10 +61,10 @@ This page lists and explains all of the predicates and values used within the pr
   General information about a course in the educational institution. An ideal
   period of 0 is equivalent to no ideal period.
 
-+ `joint/2(course A id, course B id)`
++ `joint/3(course A id, course B id, offering group)`
 
-  Indicates that `course A` and `course B` should be offered in the same
-  classroom and at the same time.
+  Indicates that a given offering of course A and course B should be scheduled
+  in the same classroom and at the same time.
 
 + `schedule_on/3(course id, offering group, part of the day)`
   
@@ -91,9 +91,11 @@ This page lists and explains all of the predicates and values used within the pr
 
 ### Offerings' information
 
-+ `class/4(course id, offering group, weekday, period)`
++ `class/5(course id, offering group, weekday, period, fixed?)`
 
-  Schedule a class of a given course to a weekday
+  Schedule a class of a given course to a weekday. Fixed is 1 if the class was
+  manually scheduled by the user, or 0 if it was scheduled automatically by the
+  scheduler.
 
 + `lecturer/3(course id, offering group, teacher id)`
 
@@ -144,3 +146,7 @@ writing rules in a more concise manner.
 
   Ordered (non symmetric) version of `joint`. Useful whenever is necessary to
   access one instance of a jointed classes pair.
+
++ `true = 1`: truthy constant (same as `int(True)` in Python)
+
++ `false = 0`: truthy constant (same as `int(False)` in Python)

@@ -32,29 +32,35 @@ primary_lecturer(Course, Group, Teacher) :-
     N = #min { OtherN: lecturer(Course, Group, OtherTeacher),  availability(OtherTeacher, OtherN)}.
 
 %*
-def class/4(
+def class/5(
     course id,
     offering group,
     weekday,
-    period
+    period,
+    fixed?
 )
 *%
 % Schedule non-jointed classes
-{ class(Course, Group, W, P): available(Teacher, W, P) } == NumClasses :-
+{ class(Course, Group, W, P, false): available(Teacher, W, P) } :-
     not joint(Course, _, Group),
-    num_classes(Course, NumClasses),
     lecturer(Course, Group, Teacher).
 
 % Schedule jointed classes
-{ class(CourseA, Group, W, P): available(Teacher, W, P) } == NumClasses :-
+{ class(CourseA, Group, W, P, false): available(Teacher, W, P) } :-
     joint(CourseA, CourseB, Group),
-    num_classes(CourseA, NumClasses),
     lecturer(CourseA, Group, _).
 
-class(CourseB, OfferingGroup, W, P) :-
+class(CourseB, OfferingGroup, W, P, Fixed) :-
     joint(CourseA, CourseB, OfferingGroup),
     lecturer(CourseB, OfferingGroup, _),
-    class(CourseA, OfferingGroup, W, P).
+    class(CourseA, OfferingGroup, W, P, Fixed).
+
+%*
+The number of weekly classes of an offered course must be respected.
+*%
+:- { class(Course, Group, W, P, _) } != NumClasses,
+    num_classes(Course, NumClasses),
+    lecturer(Course, Group, _).
 
 %*
 def conflict/6(
@@ -68,14 +74,14 @@ def conflict/6(
 *%
 % Group conflict
 conflict(CourseA, GroupA, CourseB, GroupB, Weekday, Period) :-
-    class(CourseA, GroupA, Weekday, Period),
-    class(CourseB, GroupB, Weekday, Period),
+    class(CourseA, GroupA, Weekday, Period, _),
+    class(CourseB, GroupB, Weekday, Period, _),
     GroupA != GroupB.
 
 % Class conflict
 conflict(CourseA, Group, CourseB, Group, Weekday, Period) :-
-    class(CourseA, Group, Weekday, Period),
-    class(CourseB, Group, Weekday, Period),
+    class(CourseA, Group, Weekday, Period, _),
+    class(CourseB, Group, Weekday, Period, _),
     CourseA != CourseB,
     not joint(CourseA, CourseB, Group).
 
@@ -87,35 +93,37 @@ Two classes taught by the same teacher shouldn't conflict.
     lecturer(CourseB, GroupB, Teacher).
 
 %*
-Classes should be scheduled in the correct parts of the day
+Classes should be scheduled in the correct parts of the day, unless
+they are fixed
 *%
-:- class(Course, Group, _, Period),
+:- class(Course, Group, _, Period, false),
     part_of_day(Period, PartOfDay),
     not schedule_on(Course, Group, PartOfDay).
 
 %*
-Classes must respect the lecturer(s)' available times.
+Classes must respect the lecturer(s)' available times, unless they
+are fixed.
 *%
-:- class(Course, Group, Weekday, Period),
+:- class(Course, Group, Weekday, Period, false),
     lecturer(Course, Group, Teacher),
     not available(Teacher, Weekday, Period).
 
 %*
 Classes from double courses must be schedule one after another in the same
-day.
+day, unless they are fixed.
 *%
 % Different days of the week
-:- class(Course, Group, Weekday1, _),
-    class(Course, Group, Weekday2, _),
+:- class(Course, Group, Weekday1, _, false),
+    class(Course, Group, Weekday2, _, _),
     is_double(Course),
     Weekday1 != Weekday2.
 
-% Ensure double classes are scheduled in consecutive periods
-:- class(Course, Group, _, Period1),
-    class(Course, Group, _, Period2),
+% Ensure double classes are scheduled in consecutive periods, unless they are
+% fixed.
+:- class(Course, Group, _, Period1, false),
+    class(Course, Group, _, Period2, _),
     is_double(Course),
     Period2 != Period1,
     |Period2 - Period1| != 1.
 
-
-#show class/4.
+#show class/5.
