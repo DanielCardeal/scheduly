@@ -1,7 +1,7 @@
 %*
 Obligatory courses of the same ideal semester should not conflict (only for BCC)
 *%
-:- _conflict(CourseA, "bcc", CourseB, "bcc"),
+:- conflict(CourseA, "bcc", CourseB, "bcc"),
     is_obligatory(CourseA),
     is_obligatory(CourseB),
     ideal_semester(CourseA, IdealSemester),
