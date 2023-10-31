@@ -11,7 +11,7 @@ readme = "README.md"
 packages = [{include = "ime_usp_class_scheduler", from = "src/py"}]
 
 [tool.poetry.scripts]
-scheduler = "ime_usp_class_scheduler.main:main"
+scheduly = "ime_usp_class_scheduler.main:main"
 
 [tool.poetry.dependencies]
 python = "~3.10"
@@ -29,6 +29,7 @@ isort = "^5.12.0"
 mypy = "^1.4.1"
 pytest = "^7.4.0"
 ruff = "^0.1.1"
+mdformat-gfm = "^0.3.5"
 
 [tool.autoflake]
 recursive = true

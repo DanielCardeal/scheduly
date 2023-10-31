@@ -5,6 +5,12 @@
 set -e
 cd "$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )/../"
 
+echo "Documentation checks"
+
+echo ' + docs (start)'
+mdformat --check .
+echo ' + docs (end)'
+
 echo "Python tests and checks:"
 
 echo "+ black (start)"

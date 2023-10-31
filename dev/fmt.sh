@@ -3,6 +3,10 @@
 set -e
 cd "$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )/../"
 
+echo ' + docs (start)'
+mdformat .
+echo ' + docs (end)'
+
 echo '+ black (start)'
 poetry run black .
 echo '+ black (end)'

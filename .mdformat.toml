@@ -1,0 +1,4 @@
+# Configuration options for the mdformat markdown formatter
+number = true
+end_of_line = "lf"
+wrap = 80
