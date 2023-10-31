@@ -1,17 +1,18 @@
 import json
 from abc import ABC, abstractmethod
 from collections import deque
-from typing import IO, Any
+from typing import IO, Optional
 
 import rich
-from clingo import Model, SolveResult, Symbol, SymbolType
+from clingo import Model, SolveResult
 
 from ime_usp_class_scheduler.log import CONSOLE, LOG_INFO, LOG_WARN
 from ime_usp_class_scheduler.model.configuration import Configuration
 from ime_usp_class_scheduler.model.input import InputDataset
 from ime_usp_class_scheduler.model.output import ModelResult
+from ime_usp_class_scheduler.paths import OUTPUT_DIR
 from ime_usp_class_scheduler.solver import CliSolver, Solver
-from ime_usp_class_scheduler.view import CliTabularView
+from ime_usp_class_scheduler.view import CliTabularView, CSVTabularView
 
 
 class Program(ABC):
@@ -45,7 +46,7 @@ class CliProgram(Program):
     def __init__(
         self,
         configuration: Configuration,
-        dump_symbols: bool,
+        dump_symbols: Optional[str],
     ) -> None:
         self._solver = CliSolver(
             configuration.options,
@@ -82,37 +83,26 @@ class CliProgram(Program):
         for model in self._best_models:
             self._model_viewer.show_model(model)
 
-        if self._dump_symbols:
-            json_str = self._dump_json()
-            rich.print_json(json_str)
+        match self._dump_symbols:
+            case "json":
+                json_str = self._dump_json()
+                rich.print_json(json_str)
+            case "csv":
+                LOG_INFO(f"Dumping schedule results into {OUTPUT_DIR}")
+                self._dump_csv()
+
+    def _dump_csv(self) -> None:
+        for idx, model in enumerate(self._best_models):
+            csv_viewer = CSVTabularView(f"schedule_{idx}")
+            csv_viewer.show_model(model)
 
     def _dump_json(self) -> str:
         """Encode symbols of the best models into a JSON string."""
         json_data = []
 
         for idx, model in enumerate(self._best_models):
-            model_data: dict[str, Any] = {}
+            model_data = model.as_dict()
             model_data["index"] = idx
-            model_data["cost"] = model.cost
-
-            for symbol in model.symbols:
-                if symbol.name not in model_data:
-                    model_data[symbol.name] = []
-                symbol_list_repr = _get_symbol_arguments(symbol)
-                model_data[symbol.name].append(symbol_list_repr)
-
             json_data.append(model_data)
 
         return json.dumps(json_data)
-
-
-def _get_symbol_arguments(symbol: Symbol) -> list[str | int]:
-    """Get arguments of a clingo function as a list."""
-    args: list[str | int] = []
-    for arg in symbol.arguments:
-        match arg.type:
-            case SymbolType.Number:
-                args.append(arg.number)
-            case SymbolType.String:
-                args.append(arg.string)
-    return args

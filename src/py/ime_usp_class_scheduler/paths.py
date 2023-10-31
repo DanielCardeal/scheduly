@@ -20,3 +20,6 @@ INPUT_DIR = CONFIG_DIR.joinpath("inputs/")
 
 PRESETS_DIR = CONFIG_DIR.joinpath("presets/")
 """Absolute path to the presets directory."""
+
+OUTPUT_DIR = ROOT_DIR.parent.joinpath("output/")
+"""Default directory to output model results."""

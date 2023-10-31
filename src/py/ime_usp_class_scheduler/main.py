@@ -60,11 +60,11 @@ def main() -> None:
     help="Output generated ASP program to PATH",
 )
 @click.option(
-    "-J",
-    "--dump-json",
-    "dump_symbols",
-    is_flag=True,
-    help="Dump a JSON with the best models results to stdout.",
+    "-d",
+    "--dump",
+    required=False,
+    type=click.Choice(["json", "csv"], case_sensitive=False),
+    help="Dump schedule results into a traditional format.",
 )
 def cli(
     preset: str,
@@ -72,14 +72,14 @@ def cli(
     time_limit: Optional[int],
     threads: Optional[int],
     output_model: Optional[Path],
-    dump_symbols: bool,
+    dump: Optional[str],
 ) -> None:
     """Create and display a nice timetable from the terminal."""
     try:
         configuration = load_preset(
             preset, num_schedules=num_schedules, time_limit=time_limit, threads=threads
         )
-        program = CliProgram(configuration, dump_symbols=dump_symbols)
+        program = CliProgram(configuration, dump_symbols=dump)
     except (ParsingError, InconsistentInputError) as e:
         LOG_EXCEPTION(e)
         exit(EX_DATAERR)

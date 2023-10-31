@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from csv import writer
+from os import makedirs
 from typing import Any
 
 from clingo import SymbolType
 from rich.box import ROUNDED
 from rich.table import Table
 
+from ime_usp_class_scheduler.errors import FileTreeError
 from ime_usp_class_scheduler.log import CONSOLE
 from ime_usp_class_scheduler.model.common import Period, Weekday
 from ime_usp_class_scheduler.model.output import (
@@ -15,6 +18,7 @@ from ime_usp_class_scheduler.model.output import (
     JointedData,
     ModelResult,
 )
+from ime_usp_class_scheduler.paths import OUTPUT_DIR
 
 MAX_OFFERING_GROUP_LENGTH = 20
 
@@ -59,8 +63,8 @@ class ModelView(ABC):
                     self.jointed.add(JointedData.from_asp(symbol))
 
 
-class CliTabularView(ModelView):
-    """Model viewer that displays models as pretty CLI tables."""
+class TabularView(ModelView):
+    """Model viewer that uses a tabular representation of tables"""
 
     def _update_schedule(self, model: ModelResult) -> None:
         super()._update_schedule(model)
@@ -128,6 +132,10 @@ class CliTabularView(ModelView):
             class_str += f" ({class_.offering_group[:MAX_OFFERING_GROUP_LENGTH]})"
             self.schedule[class_.weekday][class_.period].add(class_str)
 
+
+class CliTabularView(TabularView):
+    """Model viewer that displays models as pretty CLI tables."""
+
     def show_model(self, model: ModelResult) -> None:
         """Displays the model as a pretty CLI table."""
         self._update_schedule(model)
@@ -147,3 +155,35 @@ class CliTabularView(ModelView):
 
         CONSOLE.print(table)
         CONSOLE.print()
+
+
+class CSVTabularView(TabularView):
+    """Helper model viewer that dumps models to a CSV file."""
+
+    def __init__(self, filename: str) -> None:
+        super().__init__()
+        self.filename = filename
+
+    def show_model(self, model: ModelResult) -> None:
+        """Outputs `model` to the outputfile, overwritting its contents."""
+        self._update_schedule(model)
+
+        headers = ["Period", *[str(w) for w in Weekday]]
+        rows = []
+        for p in Period:
+            row = [str(p)]
+            for w in Weekday:
+                row.append("\n".join(self.schedule[w][p]))
+            rows.append(row)
+
+        out_path = OUTPUT_DIR.joinpath(self.filename).with_suffix(".csv")
+        try:
+            makedirs(OUTPUT_DIR, exist_ok=True)
+            with open(out_path, "w", newline="") as csv_file:
+                csv_writer = writer(csv_file)
+                csv_writer.writerow(headers)
+                csv_writer.writerows(rows)
+        except OSError as e:
+            raise FileTreeError(
+                f"Unable to write schedule result to {out_path}: {e.strerror}"
+            )

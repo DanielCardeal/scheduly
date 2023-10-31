@@ -1,5 +1,5 @@
 """Dataclasses that model results from a scheduler run."""
-from typing import Protocol, Sequence
+from typing import Any, Protocol, Sequence
 
 from attrs import frozen
 from clingo import Model, Symbol, SymbolType
@@ -130,3 +130,26 @@ class ModelResult:
         symbols = model.symbols(shown=True)
         cost = model.cost
         return cls(symbols, cost)
+
+    def as_dict(self) -> dict[str, Any]:
+        """Convert ModelResult instance to dict."""
+        data: dict[str, Any] = {}
+        data["cost"] = self.cost
+        for symbol in self.symbols:
+            if symbol.name not in data:
+                data[symbol.name] = []
+            symbol_list_repr = _get_symbol_arguments(symbol)
+            data[symbol.name].append(symbol_list_repr)
+        return data
+
+
+def _get_symbol_arguments(symbol: Symbol) -> list[str | int]:
+    """Get arguments of a clingo function as a list."""
+    args: list[str | int] = []
+    for arg in symbol.arguments:
+        match arg.type:
+            case SymbolType.Number:
+                args.append(arg.number)
+            case SymbolType.String:
+                args.append(arg.string)
+    return args
