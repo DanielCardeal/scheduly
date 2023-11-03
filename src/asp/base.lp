@@ -40,20 +40,13 @@ def class/5(
     fixed?
 )
 *%
-% Schedule non-jointed classes
 { class(Course, Group, W, P, false): available(Teacher, W, P) } :-
-    not joint(Course, _, Group),
-    lecturer(Course, Group, Teacher).
+    primary_lecturer(Course, Group, Teacher).
 
-% Schedule jointed classes
-{ class(CourseA, Group, W, P, false): available(Teacher, W, P) } :-
+% Add additional predicates for jointed classes
+class(CourseB, Group, W, P, Fixed) :-
     joint(CourseA, CourseB, Group),
-    lecturer(CourseA, Group, _).
-
-class(CourseB, OfferingGroup, W, P, Fixed) :-
-    joint(CourseA, CourseB, OfferingGroup),
-    lecturer(CourseB, OfferingGroup, _),
-    class(CourseA, OfferingGroup, W, P, Fixed).
+    class(CourseA, Group, W, P, Fixed).
 
 %*
 The number of weekly classes of an offered course must be respected.
