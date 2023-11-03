@@ -1,3 +1,6 @@
+% WARNING: Changes in the base model are possibly destructive and should be
+% carrefully considered.
+
 %*
 def weekday/1(weekday id)
 *%
