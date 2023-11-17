@@ -4,7 +4,7 @@
 %*
 def weekday/1(weekday id)
 *%
-weekday(0..5).
+weekday(0..4).
 
 %*
 def period/1(period id)
