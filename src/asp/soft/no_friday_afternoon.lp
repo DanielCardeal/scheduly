@@ -2,7 +2,7 @@
 Avoid scheduling BCC undergrad classes after friday morning.
 *%
 friday_afternoon_class(Course, Period) :-
-    class(Course, "bcc", 4, Period, false),
+    class(Course, "bcc", friday, Period, false),
     is_undergrad(Course),
     part_of_day(Period, PartOfDay),
     PartOfDay != "morning".

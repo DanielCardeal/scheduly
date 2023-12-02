@@ -1,25 +1,36 @@
 % WARNING: Changes in the base model are possibly destructive and should be
 % carrefully considered.
 
+#const monday = 0.
+#const tuesday = 1.
+#const wednesday = 2.
+#const thursday = 3.
+#const friday = 4.
+
 %*
 def weekday/1(weekday id)
 *%
 weekday(0..4).
 
+% Horários letivos
+#const morning1 = 0.
+#const morning2 = 1.
+#const afternoon1 = 2.
+#const afternoon2 = 3.
+#const night1 = 4.
+#const night2 = 5.
+
 %*
 def period/1(period id)
 *%
-period(0..5).
+period(morning1..night2).
 
 %*
 def part_of_day(period id, part of the day)
 *%
-part_of_day(0, "morning").
-part_of_day(1, "morning").
-part_of_day(2, "afternoon").
-part_of_day(3, "afternoon").
-part_of_day(4, "night").
-part_of_day(5, "night").
+partofday(morning1..morning2, morning).
+partofday(afternoon1..afternoon2, afternoon).
+partofday(night1..night2, night).
 
 %*
 Ensures joint/3 is symmetric
