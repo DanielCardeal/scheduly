@@ -14,7 +14,7 @@ special meaning inside the scheduler.
 A string that **uniquely** identifies a course offered by the institute.
 Examples: "mac0110", "mac5770", "mae0217", "4310145"
 
-### `course_id`
+### `group_id`
 
 A string that **uniquely** identifies an offering group for a course. Examples:
 "T1", "IME", "44"
